@@ -26,12 +26,9 @@ public class PlayerJoinScript : MonoBehaviour
     {
         Debug.Log("Started AddPlayers()");
 
-        Gamepad[] gamepads = Gamepad.all.ToArray();
-        InputDevice[] inputDevices = new InputDevice[2];
+        var gamepads = Gamepad.all.ToList();
 
-        Debug.Log($"Found {gamepads.Length} gamepads");
-
-        if (gamepads.Length == 0)
+        if (gamepads.Count == 0)
         {
             Debug.Log("Not enough gamepads!");
             NotEnoughControllersUnityEvent?.Invoke();
@@ -39,34 +36,31 @@ public class PlayerJoinScript : MonoBehaviour
             return;
         }
 
-        Debug.Log("Enough gamepads!");
-
         Time.timeScale = 1f;
-        inputDevices[0] = gamepads[0];
 
+        int playerCount = Mathf.Min(
+            gamepads.Count + 1,      // allow keyboard as extra
+            spawnPoints.Count        // don't exceed spawn points
+        );
 
-        // Set second input as either Gamepad or Keyboard
-        if (gamepads.Length == 2)
+        for (int i = 0; i < playerCount; i++)
         {
-            Debug.Log("Setting 2nd controller to gamepad");
-            inputDevices[1] = gamepads[1];
-        }
-        else
-        {
-            Debug.Log("Setting 2nd controller to keyboard");
-            inputDevices[1] = Keyboard.current;
-        }
+            InputDevice device =
+                i < gamepads.Count ? gamepads[i] : Keyboard.current;
 
-        // Join the players with the correct input devices
-        for (int i = 0; i < inputDevices.Length; i++)
-        {
-            Debug.Log($"Adding player {i}");
-            var playerInput = playerInputManager.JoinPlayer(i, -1, null, inputDevices[i]);
-            playerInputManager.playerPrefab = playerPrefabB;
+            Debug.Log($"Adding player {i} with {device.displayName}");
+
+            var playerInput = playerInputManager.JoinPlayer(
+                i,
+                -1,
+                null,
+                device
+            );
 
             PositionPlayerTransforms(playerInput);
         }
     }
+
 
     private void PositionPlayerTransforms(PlayerInput playerInput)
     {

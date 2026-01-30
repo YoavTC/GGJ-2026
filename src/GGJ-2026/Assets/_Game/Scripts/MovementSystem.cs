@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class MovementSystem : MonoBehaviour
 {
@@ -7,36 +8,84 @@ public class MovementSystem : MonoBehaviour
     [SerializeField] private Transform _groundCheck;
     [SerializeField] private LayerMask _groundLayer;
 
+    public InputAction playerMovement;
+
     [Header("Settings")]
     [SerializeField] private float _moveSpeed = 8f;
     [SerializeField] private float _acceleration = 50f;
     [SerializeField] private float _airControl = 0.6f;
     [SerializeField] private float _jumpForce = 12f;
     [SerializeField] private float _groundCheckRadius = 0.1f;
+
     [Space]
     [SerializeField] private bool _snappyMovement = true;
     [SerializeField] private bool _punishBunnyHopping = false;
     [SerializeField] private AnimationCurve _bunnyHoppingPunishCurve;
 
-    private float _input;
+    private Vector2 movement;
     private bool _wantJump;
-    private int jumpCount = 0;
+    private int jumpCount;
+
+    private void OnEnable()
+    {
+        playerMovement.Enable();
+    }
+
+    private void OnDisable()
+    {
+        playerMovement.Disable();
+    }
 
     void FixedUpdate()
     {
-        bool grounded = Physics2D.OverlapCircle(_groundCheck.position, _groundCheckRadius, _groundLayer);
-        float bunnyHoppingPunishFactor = _punishBunnyHopping ? _bunnyHoppingPunishCurve.Evaluate(jumpCount) : 1f;
+        HandleMovement();
+    }
 
-        // Calculate target and smoothly move towards it. Allow reduced control in air.
-        float targetSpeed = _input * _moveSpeed;
+    public void OnMove(InputAction.CallbackContext context)
+    {
+        movement = context.ReadValue<Vector2>();
+    }
+
+    public void OnJump(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+            _wantJump = true;
+    }
+
+    private void HandleMovement()
+    {
+        bool grounded = Physics2D.OverlapCircle(
+            _groundCheck.position,
+            _groundCheckRadius,
+            _groundLayer
+        );
+
+        if (grounded)
+            jumpCount = 0;
+
+        float bunnyHoppingPunishFactor =
+            _punishBunnyHopping ? _bunnyHoppingPunishCurve.Evaluate(jumpCount) : 1f;
+
+        // Horizontal movement (use movement.x)
+        float targetSpeedX = movement.x * _moveSpeed * bunnyHoppingPunishFactor;
         float accel = _acceleration * (grounded ? 1f : _airControl);
-        float newVelX = Mathf.MoveTowards(_rb.linearVelocity.x, targetSpeed * bunnyHoppingPunishFactor, accel * Time.fixedDeltaTime);
 
+        float newVelX = Mathf.MoveTowards(
+            _rb.linearVelocity.x,
+            targetSpeedX,
+            accel * Time.fixedDeltaTime
+        );
+
+        // Jump
         if (_wantJump && grounded)
         {
-            _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, _jumpForce * bunnyHoppingPunishFactor);
+            _rb.linearVelocity = new Vector2(
+                _rb.linearVelocity.x,
+                _jumpForce * bunnyHoppingPunishFactor
+            );
             jumpCount++;
         }
+
         _wantJump = false;
 
         // Apply velocity
