@@ -121,7 +121,7 @@ MonoBehaviour:
   _moveSpeed: 8
   _acceleration: 50
   _airControl: 0.8
-  _jumpForce: 10
+  _jumpForce: 15
   _groundCheckRadius: 0.1
   _snappyMovement: 1
   _punishBunnyHopping: 0
@@ -230,7 +230,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 1
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!114 &660236001962160322
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -271,7 +271,7 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
     m_ActionId: 9d6d21ce-a297-485e-ab60-a6d4da934a7a
-    m_ActionName: 'Player/Jump[/DualSenseGamepadHID/buttonSouth,/Keyboard/space]'
+    m_ActionName: 'Player/Jump[/DualSenseGamepadHID/buttonSouth,/XInputControllerWindows1/buttonSouth,/Keyboard/space]'
   - m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 5785483352434574788}
@@ -287,11 +287,55 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
     m_ActionId: 6d4cef6b-587f-4a91-8292-a0b8592e7eaf
-    m_ActionName: 'Player/Move[/DualSenseGamepadHID/leftStick,/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d]'
+    m_ActionName: 'Player/Move[/DualSenseGamepadHID/leftStick,/XInputControllerWindows1/leftStick,/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d]'
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 5785483352434574788}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: 7dda7510-8046-4a67-afbc-f7af40835bcc
-    m_ActionName: 'Player/Join[/Keyboard/x,/DualSenseGamepadHID/leftTrigger]'
+    m_ActionName: 'Player/Join[/Keyboard/x,/DualSenseGamepadHID/leftTrigger,/XInputControllerWindows1/leftTrigger]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5785483352434574788}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 35174c91-fbc7-41a9-8452-cb8e5204b303
+    m_ActionName: 'Player/Basic Attack[/Mouse/press,/DualSenseGamepadHID/buttonWest,/XInputControllerWindows1/buttonWest]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5785483352434574788}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 106a50d7-d295-426e-8fa6-5d40700eb311
+    m_ActionName: 'Player/MaskAbility[/DualSenseGamepadHID/buttonNorth,/XInputControllerWindows1/buttonNorth,/Keyboard/shift]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
