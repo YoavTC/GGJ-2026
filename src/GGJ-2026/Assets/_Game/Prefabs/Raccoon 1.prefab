@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 1918372443166222752}
   - component: {fileID: 660236001962160322}
   m_Layer: 0
-  m_Name: Raccoon
+  m_Name: Raccoon 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
