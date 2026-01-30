@@ -301,7 +301,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   playerMasks:
-  - {fileID: 11400000, guid: 7a9fc2d5c138f14439d897377f2ef7c4, type: 2}
+  - {fileID: 11400000, guid: 57b1d46f50226c748a5f76699ffdafc3, type: 2}
   _meleeCooldown: 0.5
   _slamDownCooldown: 1
   _abilityCooldown: 2
@@ -362,6 +362,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  _heavyMoveMultiplier: 0.6
+  _heavyJumpMultiplier: 0.7
 --- !u!114 &7105551422550602600
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -387,6 +389,9 @@ MonoBehaviour:
   _abilityDuration: 0
   _abilityRange: {x: 3, y: 2}
   _deflectDuration: 0.5
+  _heavyDuration: 2.5
+  _heavySlamDamageMultiplier: 1.5
+  _heavyMassMultiplier: 2
 --- !u!1 &1818547886868318250
 GameObject:
   m_ObjectHideFlags: 0

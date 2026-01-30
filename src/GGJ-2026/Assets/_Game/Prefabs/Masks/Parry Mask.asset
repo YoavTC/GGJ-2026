@@ -17,3 +17,4 @@ MonoBehaviour:
   MaskName: Mask of Deflection
   Description: 'Creates a small window where you deflect damage- extra cooldown if
     unsuccessful.  '
+  maskCooldown: 3
