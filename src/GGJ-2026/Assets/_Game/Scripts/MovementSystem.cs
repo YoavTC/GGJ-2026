@@ -1,13 +1,11 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
-public class PlayerMovement : MonoBehaviour
+public class MovementSystem : MonoBehaviour
 {
     [Header("Components")]
     [SerializeField] private Rigidbody2D _rb;
     [SerializeField] private Transform _groundCheck;
     [SerializeField] private LayerMask _groundLayer;
-    [SerializeField] private PlayerInput _playerInput;
 
     [Header("Settings")]
     [SerializeField] private float _moveSpeed = 8f;
@@ -23,24 +21,6 @@ public class PlayerMovement : MonoBehaviour
     private float _input;
     private bool _wantJump;
     private int jumpCount = 0;
-
-    private void Start()
-    {
-
-    }
-
-    void Update()
-    {
-        // Read player input (use raw for snappier control like in platform fighters)
-        _input = _snappyMovement ? Input.GetAxisRaw("Horizontal") : Input.GetAxis("Horizontal");
-
-        if (Input.GetButton("Jump"))
-            _wantJump = true;
-        else
-            jumpCount = 0;
-
-        Debug.Log(Input.GetKeyDown(KeyCode.Joystick2Button0));
-    }
 
     void FixedUpdate()
     {
@@ -61,14 +41,5 @@ public class PlayerMovement : MonoBehaviour
 
         // Apply velocity
         _rb.linearVelocity = new Vector2(newVelX, _rb.linearVelocity.y);
-    }
-
-    void OnDrawGizmosSelected()
-    {
-        if (_groundCheck != null)
-        {
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(_groundCheck.position, _groundCheckRadius);
-        }
     }
 }
