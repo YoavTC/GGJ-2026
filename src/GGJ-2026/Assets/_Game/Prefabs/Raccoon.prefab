@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 8039556172610068593}
   - component: {fileID: 5785483352434574788}
   - component: {fileID: 7105551422550602600}
+  - component: {fileID: 8319120091232246666}
   m_Layer: 0
   m_Name: Raccoon
   m_TagString: Untagged
@@ -159,8 +160,8 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDamping: 0
   m_AngularDamping: 0.05
-  m_GravityScale: 3
-  m_Material: {fileID: 0}
+  m_GravityScale: 6
+  m_Material: {fileID: 6200000, guid: c79a1dac225c5da40ad0d1b110482958, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -276,6 +277,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 106a50d7-d295-426e-8fa6-5d40700eb311
     m_ActionName: 'Player/MaskAbility[/DualSenseGamepadHID/buttonNorth,/XInputControllerWindows1/buttonNorth,/Keyboard/shift]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8039556172610068593}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: OnRopeGrab
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: c54bb5ed-e306-413c-a6b5-3c1cefeedae9
+    m_ActionName: 'Player/RopeGrab[/XInputControllerWindows/rightTrigger]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -295,6 +312,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _movementSystem: {fileID: 5785483352434574788}
   _combatSystem: {fileID: 7105551422550602600}
+  _ropeSwingSystem: {fileID: 8319120091232246666}
   _groundCheckRadius: 0.1
   _groundCheck: {fileID: 7549435992248108952}
   _groundLayer:
@@ -324,10 +342,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _rb: {fileID: 1918372443166222752}
-  _moveSpeed: 8
-  _acceleration: 50
-  _airControl: 0.8
-  _jumpForce: 15
+  _doubleJump: 1
+  _moveSpeed: 11
+  _acceleration: 80
+  _airControl: 0.9
+  _jumpForce: 20
   _punishBunnyHopping: 0
   _bunnyHoppingPunishCurve:
     serializedVersion: 2
@@ -387,6 +406,27 @@ MonoBehaviour:
   _abilityDuration: 0
   _abilityRange: {x: 3, y: 2}
   _deflectDuration: 0.5
+--- !u!114 &8319120091232246666
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1291586540599772081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a68b9647ebd31b488a1b9917afb42b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _rb: {fileID: 1918372443166222752}
+  _gravity: 60
+  _swingDamping: 0.05
+  _playerSwingPower: 25
+  _ropeTension: 2
+  _maxSwingVelocity: 50
+  _detectionRadius: 1
+  _releaseBoost: 1.5
+  _debugReleaseKey: 101
 --- !u!1 &1818547886868318250
 GameObject:
   m_ObjectHideFlags: 0
