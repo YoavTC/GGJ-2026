@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
-
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
@@ -8,69 +6,47 @@ using UnityEngine.InputSystem;
 public class PlayerJoinScript : MonoBehaviour
 {
     [SerializeField] private PlayerInputManager playerInputManager;
-   
-    [SerializeField] public List<Transform> spawnPoints = new List<Transform>(); // List of spawn points>
-    [SerializeField] private GameObject playerPrefabB;
-
-    // private void OnEnable() => playerInputManager.onPlayerJoined += PositionPlayerTransforms;
-    // private void OnDisable() => playerInputManager.onPlayerJoined -= PositionPlayerTransforms;
+    [SerializeField] private List<Transform> spawnPoints;
 
     public UnityEvent NotEnoughControllersUnityEvent;
 
-    private void Awake()
+    private void OnEnable()
     {
-        AddPlayers();
+        playerInputManager.onPlayerJoined += OnPlayerJoined;
     }
 
-    public void AddPlayers()
+    private void OnDisable()
     {
-        Debug.Log("Started AddPlayers()");
-
-        var gamepads = Gamepad.all.ToList();
-
-        if (gamepads.Count == 0)
-        {
-            Debug.Log("Not enough gamepads!");
-            NotEnoughControllersUnityEvent?.Invoke();
-            Time.timeScale = 0f;
-            return;
-        }
-
-        Time.timeScale = 1f;
-
-        int playerCount = Mathf.Min(
-            gamepads.Count + 1,      // allow keyboard as extra
-            spawnPoints.Count        // don't exceed spawn points
-        );
-
-        for (int i = 0; i < playerCount; i++)
-        {
-            InputDevice device =
-                i < gamepads.Count ? gamepads[i] : Keyboard.current;
-
-            Debug.Log($"Adding player {i} with {device.displayName}");
-
-            var playerInput = playerInputManager.JoinPlayer(
-                i,
-                -1,
-                null,
-                device
-            );
-
-            PositionPlayerTransforms(playerInput);
-        }
+        playerInputManager.onPlayerJoined -= OnPlayerJoined;
     }
 
+    // Called by your UI menu
+    public void OpenJoinMenu()
+    {
+        Debug.Log("Join menu opened");
+        playerInputManager.EnableJoining();
+    }
+
+    // Called when menu closes / game starts
+    public void CloseJoinMenu()
+    {
+        Debug.Log("Join menu closed");
+        playerInputManager.DisableJoining();
+    }
+
+    private void OnPlayerJoined(PlayerInput playerInput)
+    {
+        PositionPlayerTransforms(playerInput);
+    }
 
     private void PositionPlayerTransforms(PlayerInput playerInput)
     {
-        Transform playerParent = playerInput.transform.root;
-        Debug.Log($"Positioning player transform {playerParent.gameObject.name}");
-        playerParent.gameObject.tag = "Player";
-        playerParent.position = spawnPoints[playerInput.playerIndex].position;
+        Transform playerRoot = playerInput.transform.root;
 
-        playerParent.gameObject.name = $"player {playerInput.playerIndex}";
+        playerRoot.tag = "Player";
+        playerRoot.name = $"Player {playerInput.playerIndex}";
+        playerRoot.position = spawnPoints[playerInput.playerIndex].position;
 
-       
+        Debug.Log($"Player {playerInput.playerIndex} joined");
     }
 }

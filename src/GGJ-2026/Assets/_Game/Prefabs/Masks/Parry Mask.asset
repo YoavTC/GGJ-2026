@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1bac52b2832521a48adce018af9dc9d8, type: 3}
-  m_Name: Heavy Mask
+  m_Name: Parry Mask
   m_EditorClassIdentifier: 
-  MaskType: 0
+  MaskType: 1
   MaskPrefab: {fileID: 501501683627888179, guid: d2b1340f3fe5b8142b959bc2dcc27296, type: 3}
-  MaskName: Chonker's Mask
-  Description: Doubles your mass, reduced knock-back and increases slam attack damage
-    + radius(?), reduced speed
+  MaskName: Mask of Deflection
+  Description: 'Creates a small window where you deflect damage- extra cooldown if
+    unsuccessful.  '
