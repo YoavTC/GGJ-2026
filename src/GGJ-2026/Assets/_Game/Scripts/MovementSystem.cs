@@ -70,27 +70,19 @@ public class MovementSystem : MonoBehaviour
             Flip();
         }
 
+        int maxJumps = _doubleJump ? 2 : 1;
 
-        // Jump
-        if (jump && ground)
+        if (jump && jumpCount < maxJumps)
         {
             _rb.linearVelocity = new Vector2(
-                _rb.linearVelocity.x,
-                _jumpForce * jumpMultiplier * bunnyHoppingPunishFactor);
-            int maxJumps = _doubleJump ? 2 : 1;
-            if (jump && jumpCount < maxJumps)
-            {
-                _rb.linearVelocity = new Vector2(
-                    newVelX,
-                    _jumpForce * bunnyHoppingPunishFactor
-                );
-                jumpCount++;
-            }
-            else
-            {
-                // Apply velocity
-                _rb.linearVelocity = new Vector2(newVelX, _rb.linearVelocity.y);
-            }
+                newVelX,
+                _jumpForce * jumpMultiplier * bunnyHoppingPunishFactor
+            );
+            jumpCount++;
+        }
+        else
+        {
+            _rb.linearVelocity = new Vector2(newVelX, _rb.linearVelocity.y);
         }
     }
 
