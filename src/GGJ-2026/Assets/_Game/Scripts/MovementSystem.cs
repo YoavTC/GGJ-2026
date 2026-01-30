@@ -34,7 +34,7 @@ public class MovementSystem : MonoBehaviour
         {
             jumpCount = 0;
         }
-        else if (jumpCount == 0) 
+        else if (jumpCount == 0)
         {
             // If we fall off a ledge without jumping, count it as the first jump used
             jumpCount = 1;
@@ -51,7 +51,7 @@ public class MovementSystem : MonoBehaviour
 
 
         // Horizontal movement (use movement.x)
-       // float targetSpeedX = move.x * _moveSpeed * bunnyHoppingPunishFactor;
+        // float targetSpeedX = move.x * _moveSpeed * bunnyHoppingPunishFactor;
         float accel = _acceleration * (ground ? 1f : _airControl);
 
         float newVelX = Mathf.MoveTowards(
@@ -76,20 +76,21 @@ public class MovementSystem : MonoBehaviour
         {
             _rb.linearVelocity = new Vector2(
                 _rb.linearVelocity.x,
-                _jumpForce * jumpMultiplier * bunnyHoppingPunishFactor
-        int maxJumps = _doubleJump ? 2 : 1;
-        if (jump && jumpCount < maxJumps)
-        {
-            _rb.linearVelocity = new Vector2(
-                newVelX,
-                _jumpForce * bunnyHoppingPunishFactor
-            );
-            jumpCount++;
-        }
-        else
-        {
-            // Apply velocity
-            _rb.linearVelocity = new Vector2(newVelX, _rb.linearVelocity.y);
+                _jumpForce * jumpMultiplier * bunnyHoppingPunishFactor);
+            int maxJumps = _doubleJump ? 2 : 1;
+            if (jump && jumpCount < maxJumps)
+            {
+                _rb.linearVelocity = new Vector2(
+                    newVelX,
+                    _jumpForce * bunnyHoppingPunishFactor
+                );
+                jumpCount++;
+            }
+            else
+            {
+                // Apply velocity
+                _rb.linearVelocity = new Vector2(newVelX, _rb.linearVelocity.y);
+            }
         }
     }
 
@@ -102,7 +103,4 @@ public class MovementSystem : MonoBehaviour
         scale.x *= -1f;
         transform.localScale = scale;
     }
-
-
-}
 }
