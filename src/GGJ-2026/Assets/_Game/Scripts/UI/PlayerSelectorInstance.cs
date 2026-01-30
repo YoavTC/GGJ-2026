@@ -1,13 +1,20 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class PlayerSelectorInstance : MonoBehaviour
 {
-    [SerializeField] private Transform _canvasTransform;
-    [SerializeField] private Transform _masksGridParent;
+    private Transform _canvasTransform;
+    private Transform _masksGridParent;
+
+    [SerializeField] private float _moveCooldown = 0.2f; // cooldown in seconds
+
+    [SerializeField] private Image _selectorImage;
 
     int _maskCount;
     int _currentIndex;
+
+    private float _lastMoveTime = -Mathf.Infinity;
 
     private enum Direction
     {
@@ -20,8 +27,11 @@ public class PlayerSelectorInstance : MonoBehaviour
     private void Awake()
     {
         CharacterSelectScreen screen = FindFirstObjectByType<CharacterSelectScreen>();
-        _canvasTransform = screen.CanvasTransform;
-        _masksGridParent = screen.MasksGridParentTransform;
+        (Transform, Transform, Color, Sprite) references = screen.GetReferences();
+        _canvasTransform = references.Item1;
+        _masksGridParent = references.Item2;
+        _selectorImage.color = references.Item3;
+        _selectorImage.sprite = references.Item4;
 
         transform.SetParent(_canvasTransform);
         _maskCount = _masksGridParent.childCount - 1;
@@ -45,6 +55,10 @@ public class PlayerSelectorInstance : MonoBehaviour
 
     private void Move(Direction direction)
     {
+        // enforce cooldown
+        if (Time.time - _lastMoveTime < _moveCooldown)
+            return;
+
         int index = _currentIndex;
 
         switch (direction)
@@ -73,7 +87,10 @@ public class PlayerSelectorInstance : MonoBehaviour
 
         // move only if index changed
         if (index != _currentIndex)
+        {
             SetPosition(index);
+            _lastMoveTime = Time.time;
+        }
     }
 
     private void SetPosition(int index)

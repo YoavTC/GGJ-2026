@@ -284,8 +284,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   masks: []
-  CanvasTransform: {fileID: 1967011008}
-  MasksGridParentTransform: {fileID: 656714535}
+  _canvasTransform: {fileID: 1967011008}
+  _masksGridParentTransform: {fileID: 656714535}
+  _sprites:
+  - {fileID: -990350924, guid: 599346e01e0ba0c44b78391fddb9e86f, type: 3}
+  - {fileID: -1964691417, guid: 599346e01e0ba0c44b78391fddb9e86f, type: 3}
+  - {fileID: 144846507, guid: 599346e01e0ba0c44b78391fddb9e86f, type: 3}
+  - {fileID: -1973355738, guid: 599346e01e0ba0c44b78391fddb9e86f, type: 3}
+  _playerColors:
+  - {r: 0.8018868, g: 0.15508187, b: 0.15508187, a: 1}
+  - {r: 0.15686274, g: 0.35016868, b: 0.8, a: 1}
+  - {r: 0.26951316, g: 0.8, b: 0.15686274, a: 1}
+  - {r: 0.9245283, g: 0.8892428, b: 0.45790315, a: 1}
 --- !u!1 &156960688
 GameObject:
   m_ObjectHideFlags: 0
