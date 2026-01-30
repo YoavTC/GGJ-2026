@@ -6,6 +6,7 @@ public class PlayerController : MonoBehaviour
     [Header("Systems")]
     [SerializeField] private MovementSystem _movementSystem;
     [SerializeField] private CombatSystem _combatSystem;
+    [SerializeField] private RopeSwingSystem _ropeSwingSystem;
 
     [Header("Ground Check")]
     [SerializeField] private float _groundCheckRadius = 0.1f;
@@ -17,12 +18,20 @@ public class PlayerController : MonoBehaviour
     bool _jump;
     bool _melee;
     bool _ability;
+    bool _ropeGrab;
 
     #region Input Callbacks
     public void OnMove(InputAction.CallbackContext context) => _move = context.ReadValue<Vector2>();
     public void OnJump(InputAction.CallbackContext context) => _jump = context.performed;
     public void OnMelee(InputAction.CallbackContext context) => _melee = context.performed;
     public void OnAbility(InputAction.CallbackContext context) => _ability = context.performed;
+    public void OnRopeGrab(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            _ropeGrab = true;
+        }
+    }
     #endregion
 
     // State variables
@@ -77,14 +86,52 @@ public class PlayerController : MonoBehaviour
             _groundLayer
         );
 
-        if (_canMove) HandleMovement();
+        HandleRopeSwing();
+
+        if (_canMove && !_ropeSwingSystem.IsSwinging()) 
+        {
+            HandleMovement();
+        }
+        
         if (_canAttack) HandleCombat();
+    }
+
+    private void FixedUpdate()
+    {
+        if (_ropeSwingSystem != null && _ropeSwingSystem.IsSwinging())
+        {
+            _ropeSwingSystem.HandleSwing();
+        }
     }
 
     private void HandleMovement()
     {
         _movementSystem.HandleMovement(_ground, _jump, _move, _knockbackData);
         _knockbackData = KnockbackData.Empty;
+        _jump = false;
+    }
+
+    private void HandleRopeSwing()
+    {
+        if (_ropeSwingSystem == null) return;
+
+        if (_ropeGrab)
+        {
+            if (_ropeSwingSystem.IsSwinging())
+            {
+                _ropeSwingSystem.ReleaseRope();
+            }
+            else
+            {
+                _ropeSwingSystem.TryLatchToRope();
+            }
+            _ropeGrab = false;
+        }
+
+        if (_ropeSwingSystem.IsSwinging())
+        {
+            _ropeSwingSystem.ApplyPlayerControl(_move.x);
+        }
     }
 
     private void HandleCombat()
