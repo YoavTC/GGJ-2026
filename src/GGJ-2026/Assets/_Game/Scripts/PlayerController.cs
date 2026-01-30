@@ -171,22 +171,25 @@ public class PlayerController : MonoBehaviour
     {
         if (_ropeSwingSystem == null) return;
 
-        if (_ropeGrab)
-        {
-            if (_ropeSwingSystem.IsSwinging())
-            {
-                _ropeSwingSystem.ReleaseRope();
-            }
-            else
-            {
-                _ropeSwingSystem.TryLatchToRope();
-            }
-            _ropeGrab = false;
-        }
-
         if (_ropeSwingSystem.IsSwinging())
         {
+            // Jump to release when already swinging
+            if (_jump)
+            {
+                _ropeSwingSystem.ReleaseRope();
+                _jump = false;
+            }
+            
             _ropeSwingSystem.ApplyPlayerControl(_move.x);
+        }
+        else
+        {
+            // Rope grab to latch when not swinging
+            if (_ropeGrab)
+            {
+                _ropeSwingSystem.TryLatchToRope();
+                _ropeGrab = false;
+            }
         }
     }
 
