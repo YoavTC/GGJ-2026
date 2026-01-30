@@ -7,6 +7,7 @@ public class MaskScriptableObjext: ScriptableObject
     public GameObject MaskPrefab;
     public string MaskName;
     [TextArea] public string Description;
+    public float maskCooldown;
 
 }
 

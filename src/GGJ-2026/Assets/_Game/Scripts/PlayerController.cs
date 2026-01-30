@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -46,9 +47,27 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float _slamDownCooldown = 1.0f;
     [SerializeField] private float _abilityCooldown = 2.0f;
 
+    [Header("Knockback")]
+    [SerializeField] private float knockbackForceMultiplier = 0.2f;
+    [SerializeField] private float minKnockbackAngle = 10f;
+    [SerializeField] private float maxKnockbackAngle = 25f;
+    [SerializeField] private float knockbackStunTime = 0.15f;
     [SerializeField] private float knockbackPercentage = 0f;
 
     private float _attackCooldownTimer;
+
+    [Header("Deflect")]
+    public bool IsDeflecting { get; private set; }
+    [SerializeField] private GameObject deflectBubble;
+
+    [Header("Heavy")]
+    public bool IsHeavy { get; private set; }
+    public float KnockbackResistanceMultiplier => IsHeavy ? 0.5f : 1f;
+    //private Dictionary<MaskType, float> _maskCooldownTimers;
+    private float _maskCooldownTimer;
+
+
+
 
     private void Start()
     {
@@ -86,11 +105,18 @@ public class PlayerController : MonoBehaviour
         }
 
         // Cooldown stun timer
-        if (_stunTimer > 0)
+        if (_stunTimer > 0f)
         {
-            Debug.Log("Stunned for " + _stunTimer + " more");
             _stunTimer -= Time.deltaTime;
-            return;
+            if (_stunTimer < 0f)
+                _stunTimer = 0f;
+        }
+
+        if (_maskCooldownTimer > 0f)
+        {
+            _maskCooldownTimer -= Time.deltaTime;
+            if (_maskCooldownTimer < 0f)
+                _maskCooldownTimer = 0f;
         }
 
         // Ground check
@@ -100,13 +126,14 @@ public class PlayerController : MonoBehaviour
             _groundLayer
         );
 
-        if (_canMove) HandleMovement();
-        if (_canAttack) HandleCombat();
+        if (_canMove && _stunTimer <= 0f) HandleMovement();
+        if (_canAttack && _stunTimer <= 0f) HandleCombat();
     }
 
     private void HandleMovement()
     {
-        _movementSystem.HandleMovement(_ground, _jump, _move, _knockbackData);
+       
+        _movementSystem.HandleMovement(_ground, _jump, _move, _knockbackData, IsHeavy);
         _knockbackData = KnockbackData.Empty;
     }
 
@@ -116,9 +143,19 @@ public class PlayerController : MonoBehaviour
 
         if (_ability)
         {
+            if (_maskCooldownTimer > 0f)
+                return;
+
             _canAttack = false;
-            _attackCooldownTimer = _abilityCooldown;
-            _combatSystem.HandleCombat(melee: false, slamDown: false, ability: true,currentMask.MaskType);
+            _attackCooldownTimer = currentMask.maskCooldown;
+            _maskCooldownTimer = currentMask.maskCooldown;
+
+            _combatSystem.HandleCombat(
+                melee: false,
+                slamDown: false,
+                ability: true,
+                currentMask.MaskType
+            );
         }
         else if (_melee)
         {
@@ -128,6 +165,7 @@ public class PlayerController : MonoBehaviour
                 _canAttack = false;
                 _attackCooldownTimer = _slamDownCooldown;
                 _combatSystem.HandleCombat(melee: false, slamDown: true, ability: false, currentMask.MaskType);
+                _stunTimer = 0.5f;
             }
             else
             {
@@ -140,9 +178,60 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    public void HandleGetHit(float damage) 
+    public void HandleGetHit(float damage,Vector2 attackerPosition,PlayerController attacker=null) 
     {
+        if (IsDeflecting && attacker != null)
+        {
+            Debug.Log($"{name} DEFLECTED the attack!");
+
+            attacker.HandleGetHit(damage, transform.position);
+            return;
+        }
+
         Debug.Log("Fuck I'm Hit "+damage);
         knockbackPercentage += damage;
+
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
+        if (rb == null) return;
+
+        // Determine horizontal direction away from attacker
+        float horizontalDir = transform.position.x < attackerPosition.x ? -1f : 1f;
+
+        // Random upward angle
+        float upAngle = Random.Range(minKnockbackAngle, maxKnockbackAngle) * Mathf.Deg2Rad;
+        /*
+        if (_ground)
+            angle = Mathf.Max(angle, 5f);
+        */
+        // Convert angle to direction
+        Vector2 direction = new Vector2(
+        horizontalDir * Mathf.Cos(upAngle),
+         Mathf.Sin(upAngle)
+            );
+        direction.y = Mathf.Abs(direction.y); // ensure upward
+
+        // Calculate final force
+        //float force = Mathf.Pow(knockbackPercentage + damage, 1.1f) * knockbackForceMultiplier;
+        float force =Mathf.Pow(knockbackPercentage + damage, 1.15f)* knockbackForceMultiplier * KnockbackResistanceMultiplier;
+        Debug.DrawRay(transform.position, direction * 3f, Color.red, 1f);
+
+        // Apply knockback
+        rb.linearVelocity = Vector2.zero; // reset existing velocity
+        rb.AddForce(direction.normalized * force, ForceMode2D.Impulse);
+
+        // Brief stun
+        _stunTimer = knockbackStunTime;
     }
+
+    public void SetDeflecting(bool value)
+    {
+        IsDeflecting = value;
+        if (IsDeflecting) { deflectBubble.SetActive(true); }else{ deflectBubble.SetActive(false); }
+    }
+
+    public void SetHeavy(bool value)
+    {
+        IsHeavy = value;
+    }
+
 }

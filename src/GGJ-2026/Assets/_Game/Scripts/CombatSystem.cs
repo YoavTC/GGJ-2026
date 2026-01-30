@@ -24,10 +24,30 @@ public class CombatSystem : MonoBehaviour
     [SerializeField] private Vector2 _abilityRange;
 
     private bool _isAttacking;
+    [SerializeField] private float _deflectDuration = 0.5f;
+
+    [Header("Heavy Mask Settings")]
+    [SerializeField] private float _heavyDuration = 2.5f;
+    [SerializeField] private float _heavySlamDamageMultiplier = 1.5f;
+    [SerializeField] private float _heavyMassMultiplier = 2f;
+
+    private PlayerController _player;
+    private float _originalMass;
+
+
 
 
     private List<PlayerController> _hitEnemies = new List<PlayerController>();
 
+
+    private void Awake()
+    {
+        _player = GetComponent<PlayerController>();
+        _rb = GetComponent<Rigidbody2D>();
+
+        if (_rb != null)
+            _originalMass = _rb.mass;
+    }
     public void HandleCombat(bool melee, bool slamDown, bool ability,MaskType maskType)
     {
         if (_isAttacking) return;
@@ -48,7 +68,7 @@ public class CombatSystem : MonoBehaviour
         {
             Debug.Log("Hit " + enemy.name);
             // Apply damage or effects to the enemy here
-            enemy.HandleGetHit(_meleeDamage);
+            enemy.HandleGetHit(_meleeDamage, transform.position, GetComponent<PlayerController>());
         }
         _isAttacking = false;
     }
@@ -57,6 +77,10 @@ public class CombatSystem : MonoBehaviour
     {
         _isAttacking = true;
         Debug.Log("Starting Slam Down Attack");
+        float slamDamage = _slamDownDamage;
+
+        if (_player != null && _player.IsHeavy)
+            slamDamage *= _heavySlamDamageMultiplier;
         _rb = GetComponent<Rigidbody2D>();
 
         if (_rb != null)
@@ -70,7 +94,7 @@ public class CombatSystem : MonoBehaviour
         {
             Debug.Log("Hit " + enemy.name);
             // Apply damage or effects to the enemy here
-            enemy.HandleGetHit(_slamDownDamage);
+            enemy.HandleGetHit(slamDamage, transform.position, _player);
         }
         _isAttacking = false;
     }
@@ -79,12 +103,29 @@ public class CombatSystem : MonoBehaviour
     {
         _isAttacking = false;
         Debug.Log("Starting Ability Attack");
+
         yield return StartCoroutine(Hit(_abilityPoint.position, _abilityRange * Vector2.one, _abilityDuration));
+        /*
         List<PlayerController> hitEnemies = _hitEnemies;
         foreach (PlayerController enemy in hitEnemies)
         {
             Debug.Log("Hit " + enemy.name);
             // Apply damage or effects to the enemy here
+        }*/
+        switch (maskType) 
+        { 
+            case MaskType.ANCHOR:
+                    break;
+            case MaskType.DEFLECT:
+                Deflect();
+                break;
+            case MaskType.HEAVY:
+                Heavy();
+                break;
+            case MaskType.KAMIKAZE:
+                break;
+            case MaskType.DASH:
+                break;
         }
         _isAttacking = false;
     }
@@ -129,4 +170,49 @@ public class CombatSystem : MonoBehaviour
         Gizmos.color = Color.green;
         Gizmos.DrawWireCube(_abilityPoint.position, _abilityRange);
     }
+    //Mask Abilities:
+    private void Deflect()
+    {
+        StartCoroutine(DeflectCoroutine());
+    }
+
+    private IEnumerator DeflectCoroutine()
+    {
+        PlayerController player = GetComponent<PlayerController>();
+        if (player == null) yield break;
+
+        Debug.Log("DEFLECT ACTIVE");
+        player.SetDeflecting(true);
+
+        yield return new WaitForSeconds(_deflectDuration);
+
+        player.SetDeflecting(false);
+        Debug.Log("DEFLECT ENDED");
+    }
+
+    private void Heavy()
+    {
+        StartCoroutine(HeavyCoroutine());
+    }
+
+    private IEnumerator HeavyCoroutine()
+    {
+        if (_player == null || _rb == null) yield break;
+
+        Debug.Log("HEAVY MASK ACTIVE");
+
+        _player.SetHeavy(true);
+        _rb.mass = _originalMass * _heavyMassMultiplier;
+
+        yield return new WaitForSeconds(_heavyDuration);
+
+        _rb.mass = _originalMass;
+        _player.SetHeavy(false);
+
+        Debug.Log("HEAVY MASK ENDED");
+    }
+
 }
+
+
+

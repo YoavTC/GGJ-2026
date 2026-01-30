@@ -16,13 +16,18 @@ public class MovementSystem : MonoBehaviour
     [SerializeField] private bool _punishBunnyHopping = false;
     [SerializeField] private AnimationCurve _bunnyHoppingPunishCurve;
     private int jumpCount;
+    [Header("Heavy Mask Multipliers")]
+    [SerializeField] private float _heavyMoveMultiplier = 0.6f;
+    [SerializeField] private float _heavyJumpMultiplier = 0.7f;
 
-    public void HandleMovement(bool ground, bool jump, Vector2 move, KnockbackData knokbackData)
+
+    public void HandleMovement(bool ground, bool jump, Vector2 move, KnockbackData knokbackData, bool isHeavy)
     {
+        /*
         if (knokbackData.Force != 0f)
         {
             // Apply knockback
-        }
+        }*/
 
         if (ground)
             jumpCount = 0;
@@ -30,8 +35,15 @@ public class MovementSystem : MonoBehaviour
         float bunnyHoppingPunishFactor =
             _punishBunnyHopping ? _bunnyHoppingPunishCurve.Evaluate(jumpCount) : 1f;
 
+        float moveMultiplier = isHeavy ? _heavyMoveMultiplier : 1f;
+        float jumpMultiplier = isHeavy ? _heavyJumpMultiplier : 1f;
+
+        // Horizontal movement
+        float targetSpeedX = move.x * _moveSpeed * moveMultiplier * bunnyHoppingPunishFactor;
+
+
         // Horizontal movement (use movement.x)
-        float targetSpeedX = move.x * _moveSpeed * bunnyHoppingPunishFactor;
+       // float targetSpeedX = move.x * _moveSpeed * bunnyHoppingPunishFactor;
         float accel = _acceleration * (ground ? 1f : _airControl);
 
         float newVelX = Mathf.MoveTowards(
@@ -56,7 +68,7 @@ public class MovementSystem : MonoBehaviour
         {
             _rb.linearVelocity = new Vector2(
                 _rb.linearVelocity.x,
-                _jumpForce * bunnyHoppingPunishFactor
+                _jumpForce * jumpMultiplier * bunnyHoppingPunishFactor
             );
             jumpCount++;
         }
