@@ -99,6 +99,8 @@ src/GGJ-2026/[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Core/Prop
 src/GGJ-2026/[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
 src/GGJ-2026/.vsconfig
 /src/GGJ-2026/Assets/Local
-src/GGJ-2026/.bezisidekick/*
-/src/GGJ-2026/Packages/com.bezi.sidekick/*
+src/GGJ-2026/.bezisidekick/
+/src/GGJ-2026/Packages/com.bezi.sidekick/
+/src/GGJ-2026/Packages/com.bezi.sidekick
+/src/GGJ-2026/Packages
 /src/GGJ-2026/Packages/com.bezi.sidekick
