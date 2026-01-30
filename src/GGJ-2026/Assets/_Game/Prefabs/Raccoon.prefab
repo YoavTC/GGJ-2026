@@ -343,8 +343,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _rb: {fileID: 1918372443166222752}
   _doubleJump: 1
-  _moveSpeed: 11
-  _acceleration: 80
+  _moveSpeed: 13
+  _acceleration: 110
   _airControl: 0.9
   _jumpForce: 20
   _punishBunnyHopping: 0
@@ -424,13 +424,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _rb: {fileID: 1918372443166222752}
-  _gravity: 60
+  _gravity: 30
   _swingDamping: 0.05
-  _playerSwingPower: 20
+  _playerSwingPower: 60
   _ropeTension: 2
-  _maxSwingVelocity: 50
+  _maxSwingVelocity: 25
   _detectionRadius: 1
-  _releaseBoost: 1.5
+  _releaseBoost: 1.2
   _debugReleaseKey: 101
 --- !u!1 &1818547886868318250
 GameObject:

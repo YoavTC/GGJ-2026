@@ -28,6 +28,7 @@ public class RopeSwingSystem : MonoBehaviour
     private float _originalGravityScale;
     private float _originalDrag;
     private Vector2 _swingVelocity;
+    private float _playerInput;
 
     private void Start()
     {
@@ -117,6 +118,7 @@ public class RopeSwingSystem : MonoBehaviour
         _isSwinging = false;
         _currentRope = null;
         _swingVelocity = Vector2.zero;
+        _playerInput = 0f;
     }
 
     public void HandleSwing()
@@ -136,6 +138,13 @@ public class RopeSwingSystem : MonoBehaviour
         _swingVelocity = tangent * tangentialSpeed;
         
         _swingVelocity -= _swingVelocity * _swingDamping;
+        
+        if (!Mathf.Approximately(_playerInput, 0f))
+        {
+            Vector2 perpendicular = new Vector2(-ropeDir.y, ropeDir.x);
+            Vector2 controlForce = perpendicular * _playerInput * _playerSwingPower;
+            _swingVelocity += controlForce * Time.fixedDeltaTime;
+        }
         
         if (currentDistance > _ropeLength)
         {
@@ -158,13 +167,7 @@ public class RopeSwingSystem : MonoBehaviour
 
     public void ApplyPlayerControl(float horizontalInput)
     {
-        if (!_isSwinging || Mathf.Approximately(horizontalInput, 0f)) return;
-
-        Vector2 ropeDir = ((Vector2)_anchorPoint - (Vector2)transform.position).normalized;
-        Vector2 perpendicular = new Vector2(ropeDir.y, -ropeDir.x);
-        
-        Vector2 controlForce = perpendicular * horizontalInput * _playerSwingPower;
-        _swingVelocity += controlForce * Time.fixedDeltaTime;
+        _playerInput = horizontalInput;
     }
 
     public bool IsSwinging()
