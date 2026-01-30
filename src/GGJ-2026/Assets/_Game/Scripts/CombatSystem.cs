@@ -130,7 +130,7 @@ public class CombatSystem : MonoBehaviour
             case MaskType.KAMIKAZE:
                 break;
             case MaskType.DASH:
-                yield return StartCoroutine(Dash());
+               //yield return StartCoroutine(Dash());
                 break;
         }
         _isAttacking = false;
@@ -218,56 +218,68 @@ public class CombatSystem : MonoBehaviour
         Debug.Log("HEAVY MASK ENDED");
     }
 
-    private IEnumerator Dash()
+    private IEnumerator Dash(Vector2 direction, bool isGrounded)
     {
         _isAttacking = true;
 
         Rigidbody2D rb = GetComponent<Rigidbody2D>();
         PlayerController player = GetComponent<PlayerController>();
-
         if (rb == null || player == null)
             yield break;
 
         player.SetDashing(true);
 
-        // Save original physics state
+        // Save physics
         float originalGravity = rb.gravityScale;
-        Vector2 originalVelocity = rb.linearVelocity;
-
-        // Lock movement and prepare dash
-        rb.linearVelocity = Vector2.zero;
         rb.gravityScale = 0f;
+        rb.linearVelocity = Vector2.zero;
 
-        // Determine dash direction (facing)
-        Vector2 dashDir = new Vector2(Mathf.Sign(transform.localScale.x), 0f);
+        // Normalize input, fallback to facing if zero
+        if (direction.sqrMagnitude < 0.01f)
+            direction = new Vector2(Mathf.Sign(transform.localScale.x), 0f);
 
-        // Rotate player sideways
-        transform.rotation = Quaternion.Euler(0, 0, -90f * dashDir.x);
+           direction.Normalize();
 
-        // Apply dash velocity directly
-        rb.linearVelocity = dashDir * _dashSpeed;
+        // Clamp downward dash if on ground
+        if (isGrounded && direction.y < 0f)
+            direction.y = 0f;
 
         float timer = 0f;
-        HashSet<PlayerController> hitPlayers = new HashSet<PlayerController>();
 
         while (timer < _dashDuration)
         {
             timer += Time.deltaTime;
+
+            // Apply dash velocity
+            rb.linearVelocity = direction * _dashSpeed;
+
+            // Compute Z-axis rotation only
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            Debug.Log("Rotation Dash Angle" + angle);
+
+            transform.rotation = Quaternion.Euler(0f, 0f, angle);
+
             yield return null;
         }
 
-        // Restore physics state
+        // Restore physics
         rb.gravityScale = originalGravity;
-
-        // Smoothly damp dash velocity to avoid floaty linger
         rb.linearVelocity *= 0.2f;
-
         transform.rotation = Quaternion.identity;
         player.SetDashing(false);
 
         _isAttacking = false;
     }
 
+
+
+
+
+    public void HandleDash(Vector2 inputDir, bool isGrounded)
+    {
+        if (_isAttacking) return;
+        StartCoroutine(Dash(inputDir, isGrounded));
+    }
 
 }
 

@@ -206,12 +206,19 @@ public class PlayerController : MonoBehaviour
             _attackCooldownTimer = currentMask.maskCooldown;
             _maskCooldownTimer = currentMask.maskCooldown;
 
-            _combatSystem.HandleCombat(
-                melee: false,
-                slamDown: false,
-                ability: true,
-                currentMask.MaskType
-            );
+            if (currentMask.MaskType == MaskType.DASH)
+            {
+                // Only dash downwards if in air
+                Vector2 dashInput = _move;
+                if (_ground && dashInput.y < -0.1f)
+                    dashInput.y = 0f; // block downward dash on ground
+
+                _combatSystem.HandleDash(dashInput.normalized, _ground);
+            }
+            else
+            {
+                _combatSystem.HandleCombat(false, false, true, currentMask.MaskType);
+            }
         }
         else if (_melee)
         {
