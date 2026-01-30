@@ -17,3 +17,4 @@ MonoBehaviour:
   MaskName: Chonker's Mask
   Description: Doubles your mass, reduced knock-back and increases slam attack damage
     + radius(?), reduced speed
+  maskCooldown: 8
