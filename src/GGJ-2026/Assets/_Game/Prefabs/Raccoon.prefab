@@ -131,7 +131,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: -0.0017113686, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -141,7 +141,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 2}
+  m_Size: {x: 1.1120644, y: 2}
   m_EdgeRadius: 0
 --- !u!50 &1918372443166222752
 Rigidbody2D:
@@ -230,7 +230,7 @@ MonoBehaviour:
   - m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 5785483352434574788}
-        m_TargetAssemblyTypeName: 
+        m_TargetAssemblyTypeName: MovementSystem, Assembly-CSharp
         m_MethodName: 
         m_Mode: 1
         m_Arguments:
@@ -299,6 +299,12 @@ MonoBehaviour:
   _groundLayer:
     serializedVersion: 2
     m_Bits: 8
+  playerMasks:
+  - {fileID: 11400000, guid: 7a9fc2d5c138f14439d897377f2ef7c4, type: 2}
+  _meleeCooldown: 0.5
+  _slamDownCooldown: 1
+  _abilityCooldown: 2
+  knockbackPercentage: 0
 --- !u!114 &5785483352434574788
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -365,9 +371,12 @@ MonoBehaviour:
   _meleePoint: {fileID: 5602912716455476835}
   _meleeDuration: 0.15
   _meleeRange: {x: 1, y: 1.5}
+  _meleeDamage: 3
   _slamDownPoint: {fileID: 5304658051075657372}
   _slamDownDuration: 0
   _slamDownRange: {x: 3, y: 0.75}
+  _slamDownForce: 20
+  _slamDownDamage: 10
   _abilityPoint: {fileID: 7919086636908481488}
   _abilityDuration: 0
   _abilityRange: {x: 3, y: 2}

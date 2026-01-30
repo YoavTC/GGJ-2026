@@ -4,6 +4,8 @@ public class MovementSystem : MonoBehaviour
 {
     [Header("Components")]
     [SerializeField] private Rigidbody2D _rb;
+    private bool _facingRight = true;
+
 
     [Header("Settings")]
     [SerializeField] private float _moveSpeed = 8f;
@@ -38,6 +40,17 @@ public class MovementSystem : MonoBehaviour
             accel * Time.fixedDeltaTime
         );
 
+        // Flip sprite based on horizontal movement
+        if (newVelX > 0.1f && !_facingRight)
+        {
+            Flip();
+        }
+        else if (newVelX < -0.1f && _facingRight)
+        {
+            Flip();
+        }
+
+
         // Jump
         if (jump && ground)
         {
@@ -53,4 +66,16 @@ public class MovementSystem : MonoBehaviour
         // Apply velocity
         _rb.linearVelocity = new Vector2(newVelX, _rb.linearVelocity.y);
     }
+
+    private void Flip()
+    {
+        _facingRight = !_facingRight;
+
+        // Flip the whole GameObject
+        Vector3 scale = transform.localScale;
+        scale.x *= -1f;
+        transform.localScale = scale;
+    }
+
+
 }

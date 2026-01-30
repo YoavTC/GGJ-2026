@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -11,6 +12,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float _groundCheckRadius = 0.1f;
     [SerializeField] private Transform _groundCheck;
     [SerializeField] private LayerMask _groundLayer;
+
+    public List<MaskScriptableObjext> playerMasks = new List<MaskScriptableObjext>(3);
+    private MaskScriptableObjext currentMask;
 
     // Input states
     Vector2 _move;
@@ -37,6 +41,15 @@ public class PlayerController : MonoBehaviour
     private int _livesRemaining;
     private float _knockbackMultiplier;
 
+    [Header("Combat Cooldowns")]
+    [SerializeField] private float _meleeCooldown = 0.5f;
+    [SerializeField] private float _slamDownCooldown = 1.0f;
+    [SerializeField] private float _abilityCooldown = 2.0f;
+
+    [SerializeField] private float knockbackPercentage = 0f;
+
+    private float _attackCooldownTimer;
+
     private void Start()
     {
         _isAlive = true;
@@ -44,6 +57,7 @@ public class PlayerController : MonoBehaviour
         _canAttack = true;
         _livesRemaining = 3;
         _knockbackMultiplier = 1f;
+        if (playerMasks.Count > 0) { currentMask = playerMasks[0]; }
     }
 
     private void Update()
@@ -60,6 +74,15 @@ public class PlayerController : MonoBehaviour
             // Respawn player
             Debug.Log("Respawn player..");
             return;
+        }
+
+        if (_attackCooldownTimer > 0f)
+        {
+            _attackCooldownTimer -= Time.deltaTime;
+            if (_attackCooldownTimer <= 0f)
+            {
+                _canAttack = true;
+            }
         }
 
         // Cooldown stun timer
@@ -89,11 +112,37 @@ public class PlayerController : MonoBehaviour
 
     private void HandleCombat()
     {
-        // TODO: implement cooldowns & logic
-        bool canMelee = _melee;
-        bool canSlamDown = false;
-        bool canAbility = _ability;
+        if (!_canAttack) return;
 
-        _combatSystem.HandleCombat(canMelee, canSlamDown, canAbility);
+        if (_ability)
+        {
+            _canAttack = false;
+            _attackCooldownTimer = _abilityCooldown;
+            _combatSystem.HandleCombat(melee: false, slamDown: false, ability: true,currentMask.MaskType);
+        }
+        else if (_melee)
+        {
+            if (!_ground && _move.y < -0.5f)
+            {
+                // Slam down attack
+                _canAttack = false;
+                _attackCooldownTimer = _slamDownCooldown;
+                _combatSystem.HandleCombat(melee: false, slamDown: true, ability: false, currentMask.MaskType);
+            }
+            else
+            {
+                // Normal melee
+                _canAttack = false;
+                _attackCooldownTimer = _meleeCooldown;
+                _combatSystem.HandleCombat(melee: true, slamDown: false, ability: false, currentMask.MaskType);
+            }
+        }
+
+    }
+
+    public void HandleGetHit(float damage) 
+    {
+        Debug.Log("Fuck I'm Hit "+damage);
+        knockbackPercentage += damage;
     }
 }
