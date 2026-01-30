@@ -10,17 +10,19 @@ GameObject:
   m_Component:
   - component: {fileID: 8108440619482722305}
   - component: {fileID: 188308426256132077}
-  - component: {fileID: 5785483352434574788}
   - component: {fileID: 2393430209023442204}
   - component: {fileID: 1918372443166222752}
   - component: {fileID: 660236001962160322}
+  - component: {fileID: 8039556172610068593}
+  - component: {fileID: 5785483352434574788}
+  - component: {fileID: 7105551422550602600}
   m_Layer: 0
-  m_Name: Raccoon 1
+  m_Name: Raccoon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &8108440619482722305
 Transform:
   m_ObjectHideFlags: 0
@@ -35,6 +37,9 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7549435992248108952}
+  - {fileID: 5602912716455476835}
+  - {fileID: 5304658051075657372}
+  - {fileID: 7919086636908481488}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &188308426256132077
@@ -92,72 +97,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &5785483352434574788
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1291586540599772081}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7df233a64106837449fd1d4f623bfdf8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _rb: {fileID: 1918372443166222752}
-  _groundCheck: {fileID: 7549435992248108952}
-  _groundLayer:
-    serializedVersion: 2
-    m_Bits: 8
-  playerMovement:
-    m_Name: Player Movement
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: 929c7370-d0f0-4cf6-8953-e55c3c1d4cd0
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
-  _moveSpeed: 8
-  _acceleration: 50
-  _airControl: 0.8
-  _jumpForce: 15
-  _groundCheckRadius: 0.1
-  _snappyMovement: 1
-  _punishBunnyHopping: 0
-  _bunnyHoppingPunishCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.09389537
-    - serializedVersion: 3
-      time: 6.852277
-      value: 0.9499181
-      inSlope: -0.0243683
-      outSlope: -0.0243683
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.06104634
-      outWeight: 0.1394281
-    - serializedVersion: 3
-      time: 10
-      value: 0.5
-      inSlope: -0.36311305
-      outSlope: -0.36311305
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.22475486
-      outWeight: 0.33200553
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
 --- !u!61 &2393430209023442204
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -258,8 +197,8 @@ MonoBehaviour:
   m_ActionEvents:
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5785483352434574788}
-        m_TargetAssemblyTypeName: MovementSystem, Assembly-CSharp
+      - m_Target: {fileID: 8039556172610068593}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
         m_MethodName: OnJump
         m_Mode: 0
         m_Arguments:
@@ -274,8 +213,8 @@ MonoBehaviour:
     m_ActionName: 'Player/Jump[/DualSenseGamepadHID/buttonSouth,/XInputControllerWindows1/buttonSouth,/Keyboard/space]'
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5785483352434574788}
-        m_TargetAssemblyTypeName: MovementSystem, Assembly-CSharp
+      - m_Target: {fileID: 8039556172610068593}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
         m_MethodName: OnMove
         m_Mode: 0
         m_Arguments:
@@ -306,13 +245,13 @@ MonoBehaviour:
     m_ActionName: 'Player/Join[/Keyboard/x,/DualSenseGamepadHID/leftTrigger,/XInputControllerWindows1/leftTrigger]'
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5785483352434574788}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
-        m_Mode: 1
+      - m_Target: {fileID: 8039556172610068593}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: OnMelee
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -322,13 +261,13 @@ MonoBehaviour:
     m_ActionName: 'Player/Basic Attack[/Mouse/press,/DualSenseGamepadHID/buttonWest,/XInputControllerWindows1/buttonWest]'
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5785483352434574788}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
-        m_Mode: 1
+      - m_Target: {fileID: 8039556172610068593}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: OnAbility
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -341,6 +280,128 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!114 &8039556172610068593
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1291586540599772081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9755eeabe788fbc44937058811d0a331, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _movementSystem: {fileID: 5785483352434574788}
+  _combatSystem: {fileID: 7105551422550602600}
+  _groundCheckRadius: 0.1
+  _groundCheck: {fileID: 7549435992248108952}
+  _groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
+--- !u!114 &5785483352434574788
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1291586540599772081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7df233a64106837449fd1d4f623bfdf8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _rb: {fileID: 1918372443166222752}
+  _moveSpeed: 8
+  _acceleration: 50
+  _airControl: 0.8
+  _jumpForce: 15
+  _punishBunnyHopping: 0
+  _bunnyHoppingPunishCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.09389537
+    - serializedVersion: 3
+      time: 6.852277
+      value: 0.9499181
+      inSlope: -0.0243683
+      outSlope: -0.0243683
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.06104634
+      outWeight: 0.1394281
+    - serializedVersion: 3
+      time: 10
+      value: 0.5
+      inSlope: -0.36311305
+      outSlope: -0.36311305
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.22475486
+      outWeight: 0.33200553
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &7105551422550602600
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1291586540599772081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e3fbf6c4d2066c4e87a91bdfedcb54b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _meleePoint: {fileID: 5602912716455476835}
+  _meleeDuration: 0.15
+  _meleeRange: {x: 1, y: 1.5}
+  _slamDownPoint: {fileID: 5304658051075657372}
+  _slamDownDuration: 0
+  _slamDownRange: {x: 3, y: 0.75}
+  _abilityPoint: {fileID: 7919086636908481488}
+  _abilityDuration: 0
+  _abilityRange: {x: 3, y: 2}
+--- !u!1 &1818547886868318250
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5304658051075657372}
+  m_Layer: 0
+  m_Name: Slam Down Point
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5304658051075657372
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1818547886868318250}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8108440619482722305}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3286929463099974492
 GameObject:
   m_ObjectHideFlags: 0
@@ -367,6 +428,68 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8108440619482722305}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &6963203834237175107
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5602912716455476835}
+  m_Layer: 0
+  m_Name: Melee Point
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5602912716455476835
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6963203834237175107}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.25, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8108440619482722305}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &8084870399348983372
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7919086636908481488}
+  m_Layer: 0
+  m_Name: Ability Point
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7919086636908481488
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8084870399348983372}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.25, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
