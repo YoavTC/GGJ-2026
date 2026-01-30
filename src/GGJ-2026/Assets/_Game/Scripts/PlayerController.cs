@@ -137,6 +137,7 @@ public class PlayerController : MonoBehaviour
 
         if (_canMove && _stunTimer <= 0f) HandleMovement();
         if (_canAttack && _stunTimer <= 0f) HandleCombat();
+        HandleRopeSwing();
     }
 
     private void FixedUpdate()
@@ -149,6 +150,10 @@ public class PlayerController : MonoBehaviour
 
     private void HandleMovement()
     {
+        if (_ropeSwingSystem != null && _ropeSwingSystem.IsSwinging())
+        {
+            return;
+        }
        
         _movementSystem.HandleMovement(_ground, _jump, _move, _knockbackData, IsHeavy);
         _knockbackData = KnockbackData.Empty;

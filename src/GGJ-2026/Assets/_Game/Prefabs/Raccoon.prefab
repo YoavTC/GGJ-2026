@@ -381,6 +381,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  _heavyMoveMultiplier: 0.6
+  _heavyJumpMultiplier: 0.7
 --- !u!114 &7105551422550602600
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -406,6 +408,9 @@ MonoBehaviour:
   _abilityDuration: 0
   _abilityRange: {x: 3, y: 2}
   _deflectDuration: 0.5
+  _heavyDuration: 2.5
+  _heavySlamDamageMultiplier: 1.5
+  _heavyMassMultiplier: 2
 --- !u!114 &8319120091232246666
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -421,7 +426,7 @@ MonoBehaviour:
   _rb: {fileID: 1918372443166222752}
   _gravity: 60
   _swingDamping: 0.05
-  _playerSwingPower: 25
+  _playerSwingPower: 20
   _ropeTension: 2
   _maxSwingVelocity: 50
   _detectionRadius: 1
