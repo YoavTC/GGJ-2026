@@ -29,6 +29,9 @@ public class MovementSystem : MonoBehaviour
         {
             // Apply knockback
         }*/
+        if (GetComponent<PlayerController>().IsDashing)
+            return;
+
 
         if (ground)
         {

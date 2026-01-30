@@ -34,6 +34,11 @@ public class CombatSystem : MonoBehaviour
     private PlayerController _player;
     private float _originalMass;
 
+    [Header("Dash Settings")]
+    [SerializeField] private float _dashSpeed = 30f;
+    [SerializeField] private float _dashDuration = 0.25f;
+    [SerializeField] private float _dashDamage = 30f;
+
 
 
 
@@ -125,6 +130,7 @@ public class CombatSystem : MonoBehaviour
             case MaskType.KAMIKAZE:
                 break;
             case MaskType.DASH:
+                yield return StartCoroutine(Dash());
                 break;
         }
         _isAttacking = false;
@@ -211,6 +217,57 @@ public class CombatSystem : MonoBehaviour
 
         Debug.Log("HEAVY MASK ENDED");
     }
+
+    private IEnumerator Dash()
+    {
+        _isAttacking = true;
+
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
+        PlayerController player = GetComponent<PlayerController>();
+
+        if (rb == null || player == null)
+            yield break;
+
+        player.SetDashing(true);
+
+        // Save original physics state
+        float originalGravity = rb.gravityScale;
+        Vector2 originalVelocity = rb.linearVelocity;
+
+        // Lock movement and prepare dash
+        rb.linearVelocity = Vector2.zero;
+        rb.gravityScale = 0f;
+
+        // Determine dash direction (facing)
+        Vector2 dashDir = new Vector2(Mathf.Sign(transform.localScale.x), 0f);
+
+        // Rotate player sideways
+        transform.rotation = Quaternion.Euler(0, 0, -90f * dashDir.x);
+
+        // Apply dash velocity directly
+        rb.linearVelocity = dashDir * _dashSpeed;
+
+        float timer = 0f;
+        HashSet<PlayerController> hitPlayers = new HashSet<PlayerController>();
+
+        while (timer < _dashDuration)
+        {
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
+        // Restore physics state
+        rb.gravityScale = originalGravity;
+
+        // Smoothly damp dash velocity to avoid floaty linger
+        rb.linearVelocity *= 0.2f;
+
+        transform.rotation = Quaternion.identity;
+        player.SetDashing(false);
+
+        _isAttacking = false;
+    }
+
 
 }
 

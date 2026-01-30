@@ -75,6 +75,13 @@ public class PlayerController : MonoBehaviour
     //private Dictionary<MaskType, float> _maskCooldownTimers;
     private float _maskCooldownTimer;
 
+    [Header("Dash")]
+    [SerializeField] private float dashDamage = 30f;
+
+    private bool _isDashing;
+
+    public bool IsDashing => _isDashing;
+    public void SetDashing(bool value) => _isDashing = value;
 
 
 
@@ -279,5 +286,16 @@ public class PlayerController : MonoBehaviour
     {
         IsHeavy = value;
     }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (!_isDashing) return;
+
+        if (collision.gameObject.TryGetComponent<PlayerController>(out var enemy))
+        {
+            enemy.HandleGetHit(30f, transform.position);
+        }
+    }
+
 
 }

@@ -319,7 +319,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   playerMasks:
-  - {fileID: 11400000, guid: 7a9fc2d5c138f14439d897377f2ef7c4, type: 2}
+  - {fileID: 11400000, guid: 7345b5e5e10ae104e9ae6df3b8abcae3, type: 2}
   _meleeCooldown: 0.5
   _slamDownCooldown: 1
   _abilityCooldown: 2
@@ -329,6 +329,7 @@ MonoBehaviour:
   knockbackStunTime: 0.5
   knockbackPercentage: 0
   deflectBubble: {fileID: 8721868392448858602}
+  dashDamage: 20
 --- !u!114 &5785483352434574788
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -343,7 +344,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _rb: {fileID: 1918372443166222752}
   _doubleJump: 1
-  _moveSpeed: 11
+  _moveSpeed: 15
   _acceleration: 80
   _airControl: 0.9
   _jumpForce: 20
@@ -411,6 +412,9 @@ MonoBehaviour:
   _heavyDuration: 2.5
   _heavySlamDamageMultiplier: 1.5
   _heavyMassMultiplier: 2
+  _dashSpeed: 30
+  _dashDuration: 0.25
+  _dashDamage: 30
 --- !u!114 &8319120091232246666
 MonoBehaviour:
   m_ObjectHideFlags: 0
