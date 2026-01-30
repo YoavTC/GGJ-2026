@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -6,6 +7,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private Rigidbody2D _rb;
     [SerializeField] private Transform _groundCheck;
     [SerializeField] private LayerMask _groundLayer;
+    [SerializeField] private PlayerInput _playerInput;
 
     [Header("Settings")]
     [SerializeField] private float _moveSpeed = 8f;
@@ -22,6 +24,11 @@ public class PlayerMovement : MonoBehaviour
     private bool _wantJump;
     private int jumpCount = 0;
 
+    private void Start()
+    {
+
+    }
+
     void Update()
     {
         // Read player input (use raw for snappier control like in platform fighters)
@@ -31,6 +38,8 @@ public class PlayerMovement : MonoBehaviour
             _wantJump = true;
         else
             jumpCount = 0;
+
+        Debug.Log(Input.GetKeyDown(KeyCode.Joystick2Button0));
     }
 
     void FixedUpdate()
