@@ -7,23 +7,30 @@ public class CombatSystem : MonoBehaviour
     [Header("Melee Attack Settings")]
     [SerializeField] private Transform _meleePoint;
     [SerializeField] private float _meleeDuration;
-    [SerializeField] private float _meleeRange;
+    [SerializeField] private Vector2 _meleeRange;
 
     [Header("Slam Down Attack Settings")]
     [SerializeField] private Transform _slamDownPoint;
     [SerializeField] private float _slamDownDuration;
-    [SerializeField] private float _slamDownRange;
+    [SerializeField] private Vector2 _slamDownRange;
 
     [Header("Ability Attack Settings")]
     [SerializeField] private Transform _abilityPoint;
     [SerializeField] private float _abilityDuration;
-    [SerializeField] private float _abilityRange;
+    [SerializeField] private Vector2 _abilityRange;
 
     private List<PlayerController> _hitEnemies = new List<PlayerController>();
 
-    public void OnMelee() => StartCoroutine(Melee());
+    public void HandleCombat(bool melee, bool slamDown, bool ability)
+    {
+        if (ability) StartCoroutine(Ability());
+        else if (slamDown) StartCoroutine(SlamDown());
+        else if (melee) StartCoroutine(Melee());
+    }
+
     private IEnumerator Melee()
     {
+        Debug.Log("Starting Melee Attack");
         yield return StartCoroutine(Hit(_meleePoint.position, _meleeRange * Vector2.one, _meleeDuration));
         List<PlayerController> hitEnemies = _hitEnemies;
         foreach (PlayerController enemy in hitEnemies)
@@ -33,9 +40,9 @@ public class CombatSystem : MonoBehaviour
         }
     }
 
-    public void OnSlamDown() => StartCoroutine(SlamDown());
     private IEnumerator SlamDown()
     {
+        Debug.Log("Starting Slam Down Attack");
         yield return StartCoroutine(Hit(_slamDownPoint.position, _slamDownRange * Vector2.one, _slamDownDuration));
         List<PlayerController> hitEnemies = _hitEnemies;
         foreach (PlayerController enemy in hitEnemies)
@@ -45,9 +52,9 @@ public class CombatSystem : MonoBehaviour
         }
     }
 
-    public void OnAbility() => StartCoroutine(Ability());
     private IEnumerator Ability()
     {
+        Debug.Log("Starting Ability Attack");
         yield return StartCoroutine(Hit(_abilityPoint.position, _abilityRange * Vector2.one, _abilityDuration));
         List<PlayerController> hitEnemies = _hitEnemies;
         foreach (PlayerController enemy in hitEnemies)
@@ -86,5 +93,15 @@ public class CombatSystem : MonoBehaviour
         }
 
         _hitEnemies = hitEnemies;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireCube(_meleePoint.position, _meleeRange);
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireCube(_slamDownPoint.position, _slamDownRange);
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireCube(_abilityPoint.position, _abilityRange);
     }
 }
