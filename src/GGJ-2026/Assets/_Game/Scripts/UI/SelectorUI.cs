@@ -24,6 +24,11 @@ public class SelectorUI : MonoBehaviour
 
     private Queue<MaskScriptableObjext> masks = new Queue<MaskScriptableObjext>(3);
 
+    public MaskScriptableObjext[] GetSelectedMasks()
+    {
+        return masks.ToArray();
+    }
+
     public bool hasSelectedMasks => masks.Count > 1;
 
     int _maskCount;

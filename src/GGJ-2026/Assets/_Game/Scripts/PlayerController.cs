@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private CombatSystem _combatSystem;
     [SerializeField] private RopeSwingSystem _ropeSwingSystem;
     [SerializeField] private PlayerInput _playerInput;
+    [SerializeField] private PlayerInstance _playerInstance;
 
     public PlayerInput PlayerInput => _playerInput;
 
@@ -18,7 +19,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform _groundCheck;
     [SerializeField] private LayerMask _groundLayer;
 
-    public List<MaskScriptableObjext> playerMasks = new List<MaskScriptableObjext>(3);
+    public Queue<MaskScriptableObjext> playerMasks = new Queue<MaskScriptableObjext>(3);
     public MaskScriptableObjext currentMask;
 
     // Input states
@@ -90,21 +91,22 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private Animator _animator;
 
-
-
-
-    private void Start()
+    public void Spawn(PlayerInstance playerInstance, Queue<MaskScriptableObjext> masks)
     {
         _isAlive = true;
         _canMove = true;
         _canAttack = true;
         _livesRemaining = 3;
         _knockbackMultiplier = 1f;
-        if (playerMasks.Count > 0) { currentMask = playerMasks[0]; }
+        playerMasks = masks;
+        if (playerMasks.Count > 0) { currentMask = playerMasks.Dequeue(); }
+
+        _playerInstance = playerInstance;
     }
 
     private void Update()
     {
+        if (!_isAlive) return;
         if (!_isAlive)
         {
             if (_livesRemaining == 0)
@@ -319,7 +321,26 @@ public class PlayerController : MonoBehaviour
 
         if (_animator != null)
             _animator.SetBool("isStunned", false);
-        
+
     }
 
+    public void HandleDeath()
+    {
+        _isAlive = false;
+        _canMove = false;
+        _canAttack = false;
+
+        _livesRemaining--;
+
+        if (_livesRemaining > 0)
+        {
+            currentMask = playerMasks.Dequeue();
+        }
+        else
+        {
+            Debug.Log($"{name} has no lives remaining.");
+        }
+
+        Debug.Log($"{name} has died.");
+    }
 }
