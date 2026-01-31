@@ -180,6 +180,20 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2736bbc2f2c78a949957b0719c2992bd, type: 3}
+--- !u!114 &259221271
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc1515ab76e54f068e2f2207940fab32, type: 3}
+  m_Name: Player/Join
+  m_EditorClassIdentifier: 
+  m_Asset: {fileID: -944628639613478452, guid: 75daaa609930738409d8140a96743688, type: 3}
+  m_ActionId: 7dda7510-8046-4a67-afbc-f7af40835bcc
 --- !u!1 &316813149
 GameObject:
   m_ObjectHideFlags: 0
@@ -603,20 +617,6 @@ MonoBehaviour:
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 1
---- !u!114 &427053309
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fc1515ab76e54f068e2f2207940fab32, type: 3}
-  m_Name: Player/Join
-  m_EditorClassIdentifier: 
-  m_Asset: {fileID: -944628639613478452, guid: 194934ad8fde6b9488e374d61b27f474, type: 3}
-  m_ActionId: 7dda7510-8046-4a67-afbc-f7af40835bcc
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -1068,7 +1068,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 427053309}
+    m_Reference: {fileID: 259221271}
   m_PlayerPrefab: {fileID: 1291586540599772081, guid: d759c40de979c9840befc40979a4a559, type: 3}
   m_SplitScreen: 0
   m_MaintainAspectRatioInSplitScreen: 0
