@@ -95,8 +95,8 @@ MonoBehaviour:
   selector: {fileID: 5973352187333980170}
   slotImages:
   - {fileID: 3254089246765364686}
-  - {fileID: 743908124410969145}
   - {fileID: 265830386771828009}
+  - {fileID: 743908124410969145}
   emptySlotSprite: {fileID: 905939910, guid: e31b7299da048ac44a19ba5f212a26c6, type: 3}
   _moveCooldown: 0.2
 --- !u!114 &5372322741777799241
@@ -208,7 +208,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 9148432973142204776}
         m_TargetAssemblyTypeName: SelectorUI, Assembly-CSharp
-        m_MethodName: OnSubmit
+        m_MethodName: OnCancel
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -220,37 +220,9 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 15cef263-9014-4fd5-94d9-4e4a6234a6ef
     m_ActionName: 'UI/Cancel[/Keyboard/escape]'
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 32b35790-4ed0-4e9a-aa41-69ac6d629449
-    m_ActionName: 'UI/Point[/Mouse/position,/Touchscreen/touch0/position,/Touchscreen/touch1/position,/Touchscreen/touch2/position,/Touchscreen/touch3/position,/Touchscreen/touch4/position,/Touchscreen/touch5/position,/Touchscreen/touch6/position,/Touchscreen/touch7/position,/Touchscreen/touch8/position,/Touchscreen/touch9/position]'
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 3c7022bf-7922-4f7c-a998-c437916075ad
-    m_ActionName: 'UI/Click[/Mouse/leftButton,/Touchscreen/touch0/press,/Touchscreen/touch1/press,/Touchscreen/touch2/press,/Touchscreen/touch3/press,/Touchscreen/touch4/press,/Touchscreen/touch5/press,/Touchscreen/touch6/press,/Touchscreen/touch7/press,/Touchscreen/touch8/press,/Touchscreen/touch9/press]'
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 44b200b1-1557-4083-816c-b22cbdf77ddf
-    m_ActionName: 'UI/RightClick[/Mouse/rightButton]'
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: dad70c86-b58c-4b17-88ad-f5e53adf419e
-    m_ActionName: 'UI/MiddleClick[/Mouse/middleButton]'
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 0489e84a-4833-4c40-bfae-cea84b696689
-    m_ActionName: 'UI/ScrollWheel[/Mouse/scroll]'
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 24908448-c609-4bc3-a128-ea258674378a
-    m_ActionName: UI/TrackedDevicePosition
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 9caa3d8a-6b2f-4e8e-8bad-6ede561bd9be
-    m_ActionName: UI/TrackedDeviceOrientation
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
-  m_DefaultActionMap: UI
+  m_DefaultActionMap: MaskSelectUI
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
 --- !u!1 &718790083616942068
@@ -357,8 +329,8 @@ RectTransform:
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 216551709872291825}
-  - {fileID: 3592541655830263338}
   - {fileID: 6623762792463565146}
+  - {fileID: 3592541655830263338}
   m_Father: {fileID: 4262476757291299874}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -378,7 +350,7 @@ GameObject:
   - component: {fileID: 626303730280913024}
   - component: {fileID: 3254089246765364686}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Mask Icon 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -391,17 +363,17 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5609088302820815560}
-  m_LocalRotation: {x: -0, y: -0, z: 0.13052596, w: 0.99144495}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6919523551835124507}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 15}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 134.11345, y: -87.37696}
-  m_SizeDelta: {x: 163.33333, y: 175}
+  m_AnchoredPosition: {x: 130.57307, y: -86.167}
+  m_SizeDelta: {x: 163.289, y: 175}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &626303730280913024
 CanvasRenderer:
@@ -453,7 +425,7 @@ GameObject:
   - component: {fileID: 9011526257037032482}
   - component: {fileID: 265830386771828009}
   m_Layer: 5
-  m_Name: Image (1)
+  m_Name: Mask Icon 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -475,8 +447,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 236.61107, y: -88.58685}
-  m_SizeDelta: {x: 163.33333, y: 175}
+  m_AnchoredPosition: {x: 244.9335, y: -86.167}
+  m_SizeDelta: {x: 163.289, y: 175}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &9011526257037032482
 CanvasRenderer:
@@ -528,7 +500,7 @@ GameObject:
   - component: {fileID: 4881814395401706073}
   - component: {fileID: 743908124410969145}
   m_Layer: 5
-  m_Name: Image (2)
+  m_Name: Mask Icon 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -541,17 +513,17 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6084489312158548380}
-  m_LocalRotation: {x: -0, y: -0, z: -0.13052596, w: 0.99144495}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6919523551835124507}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -15}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 343.9485, y: -88.58685}
-  m_SizeDelta: {x: 163.33333, y: 175}
+  m_AnchoredPosition: {x: 359.65106, y: -86.167}
+  m_SizeDelta: {x: 163.289, y: 175}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4881814395401706073
 CanvasRenderer:

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -10,14 +11,17 @@ public class SelectorUI : MonoBehaviour
     //[SerializeField] private RectTransform selectorUIPrefab;
     [SerializeField] private RectTransform windowTransform;
     [SerializeField] private RectTransform selector;
-    [SerializeField] private Image[] slotImages;
+    [SerializeField] private List<Image> slotImages;
     [SerializeField] private Sprite emptySlotSprite;
 
     private Action onMaskSelect;
     private Color color;
     private Sprite selectorSprite;
     private Transform canvasTransform;
+    private Transform masksPositionsGridParentTransform;
     private Transform masksGridParentTransform;
+
+    private Queue<MaskScriptableObjext> masks = new Queue<MaskScriptableObjext>(3);
 
     int _maskCount;
     int _currentIndex;
@@ -31,12 +35,15 @@ public class SelectorUI : MonoBehaviour
         DOWN// 3
     }
 
+    private bool setupFinished = false;
+
     // Called by CharacterSelectScreen when setting up
     public void Init(
             Action onMaskSelect,
             Color color,
             Sprite selectorSprite,
             Transform canvasTransform,
+            Transform masksPositionsGridParentTransform,
             Transform masksGridParentTransform
         )
     {
@@ -44,8 +51,10 @@ public class SelectorUI : MonoBehaviour
         this.color = color;
         this.selectorSprite = selectorSprite;
         this.canvasTransform = canvasTransform;
+        this.masksPositionsGridParentTransform = masksPositionsGridParentTransform;
         this.masksGridParentTransform = masksGridParentTransform;
 
+        setupFinished = false;
         StartCoroutine(Setup());
     }
 
@@ -68,6 +77,8 @@ public class SelectorUI : MonoBehaviour
 
         yield return null; // wait one frame to ensure layout is updated
         SetPosition(UnityEngine.Random.Range(0, masksGridParentTransform.childCount - 1));
+
+        setupFinished = true;
     }
 
     public void OnDeviceLost(PlayerInput evt)
@@ -77,7 +88,7 @@ public class SelectorUI : MonoBehaviour
 
     public void OnNavigate(InputAction.CallbackContext ctx)
     {
-        if (!ctx.performed) return;
+        if (!ctx.performed || !setupFinished) return;
         Vector2 moveInput = ctx.ReadValue<Vector2>();
         if (moveInput.x < 0) Move(Direction.LEFT);
         else if (moveInput.x > 0) Move(Direction.RIGHT);
@@ -87,17 +98,30 @@ public class SelectorUI : MonoBehaviour
 
     public void OnSubmit(InputAction.CallbackContext ctx)
     {
-        if (ctx.performed)
+        if (!ctx.performed || !setupFinished) return;
+        Debug.Log("Submit pressed on index " + _currentIndex);
+        onMaskSelect?.Invoke();
+        MaskScriptableObjext mask = masksGridParentTransform.GetChild(_currentIndex).GetComponent<MaskUIReference>().mask;
+
+        if (masks.Contains(mask)) return;
+        if (masks.Count == 3)
         {
-            Debug.Log("Submit pressed on index " + _currentIndex);
-            onMaskSelect?.Invoke();
+            masks.Dequeue();
         }
+
+        masks.Enqueue(mask);
+        UpdateSelectedMasksUI();
     }
 
     public void OnCancel(InputAction.CallbackContext ctx)
     {
-        if (ctx.performed)
-            Debug.Log("Cancel pressed");
+        if (!ctx.performed || !setupFinished) return;
+        Debug.Log("Cancel pressed - clearing masks");
+        masks.Clear();
+        foreach (Image slot in slotImages)
+        {
+            slot.sprite = emptySlotSprite;
+        }
     }
 
     private void Move(Direction direction)
@@ -142,7 +166,16 @@ public class SelectorUI : MonoBehaviour
 
     private void SetPosition(int index)
     {
-        selector.position = masksGridParentTransform.GetChild(index).position;
+        selector.position = masksPositionsGridParentTransform.GetChild(index).position;
         _currentIndex = index;
+    }
+
+    private void UpdateSelectedMasksUI()
+    {
+        MaskScriptableObjext[] masksArr = masks.ToArray();
+        for (int i = 0; i < masksArr.Length; i++)
+        {
+            slotImages[i].sprite = masksArr[i].MaskIcon;
+        }
     }
 }

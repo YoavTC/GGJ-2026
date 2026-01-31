@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Parry Mask
   m_EditorClassIdentifier: 
   MaskType: 1
+  MaskIcon: {fileID: 1454487945, guid: e31b7299da048ac44a19ba5f212a26c6, type: 3}
   MaskPrefab: {fileID: 501501683627888179, guid: d2b1340f3fe5b8142b959bc2dcc27296, type: 3}
   MaskName: Mask of Deflection
   Description: 'Creates a small window where you deflect damage- extra cooldown if

@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 public class CharacterSelectScreen : MonoBehaviour
 {
     [SerializeField] private Transform _canvasTransform;
+    [SerializeField] private Transform _masksPositionsGridParentTransform;
     [SerializeField] private Transform _masksGridParentTransform;
     [SerializeField] private Transform _selectorsGridParentTransform;
     [SerializeField] private PlayerInputManager _playerInputManager;
@@ -25,6 +26,7 @@ public class CharacterSelectScreen : MonoBehaviour
             _colors[_playerInputManager.playerCount - 1],
             _selectorIndicatorSprites[_playerInputManager.playerCount - 1],
             _canvasTransform,
+            _masksPositionsGridParentTransform,
             _masksGridParentTransform);
     }
 }

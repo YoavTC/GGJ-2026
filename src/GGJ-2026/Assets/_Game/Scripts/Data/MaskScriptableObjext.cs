@@ -1,9 +1,10 @@
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Masks")]
-public class MaskScriptableObjext: ScriptableObject
+public class MaskScriptableObjext : ScriptableObject
 {
     public MaskType MaskType;
+    public Sprite MaskIcon;
     public GameObject MaskPrefab;
     public string MaskName;
     [TextArea] public string Description;

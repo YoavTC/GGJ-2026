@@ -13,7 +13,9 @@ MonoBehaviour:
   m_Name: Anchor Mask
   m_EditorClassIdentifier: 
   MaskType: 3
+  MaskIcon: {fileID: 466048345, guid: e31b7299da048ac44a19ba5f212a26c6, type: 3}
   MaskPrefab: {fileID: 3509264238770443259, guid: 007b253ac891d6a4db404a6b569b5ec5, type: 3}
   MaskName: Mask of Anchoring
   Description: Sets an anchor that you can teleport to in the next X seconds. Extra
     cooldown if not used within a timeframe
+  maskCooldown: 0
