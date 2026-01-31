@@ -1,10 +1,20 @@
 using DigitalRuby.LightningBolt;
+using MoreMountains.Feedbacks;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class CombatSystem : MonoBehaviour
 {
+    public enum AttackState
+    {
+        None,
+        Melee,
+        SlamDown,
+        Ability,
+        Dash,
+        Kamikaze
+    }
     [Header("Melee Attack Settings")]
     [SerializeField] private Transform _meleePoint;
     [SerializeField] private float _meleeDuration;
@@ -17,6 +27,7 @@ public class CombatSystem : MonoBehaviour
     [SerializeField] private Vector2 _slamDownRange;
     [SerializeField] private float _slamDownForce = 20f; // tweak to feel right
     [SerializeField] private float _slamDownDamage = 10f; // tweak to feel right
+    [SerializeField] private MMF_Player slamShake;
     private Rigidbody2D _rb;
 
     [Header("Ability Attack Settings")]
@@ -24,7 +35,7 @@ public class CombatSystem : MonoBehaviour
     [SerializeField] private float _abilityDuration;
     [SerializeField] private Vector2 _abilityRange;
 
-    private bool _isAttacking;
+   // private bool _isAttacking;
     [SerializeField] private float _deflectDuration = 0.5f;
 
     [Header("Heavy Mask Settings")]
@@ -72,7 +83,9 @@ public class CombatSystem : MonoBehaviour
     [Header("Stun Beam Settings")]
     [SerializeField] private Transform _stunBeamOrigin; // assign in inspector
 
-
+    [HideInInspector] public bool _isAttacking;
+    [HideInInspector] public AttackState _currentAttackState = AttackState.None;
+    public bool IsBusy => _isAttacking; // only true while Dash/Kamikaze coroutine runs
 
 
 
@@ -110,7 +123,7 @@ public class CombatSystem : MonoBehaviour
     public void HandleCombat(bool melee, bool slamDown, bool ability, MaskType maskType, Vector2 aimDir = default)
 
     {
-        if (_isAttacking) return;
+        if (_isAttacking && !(slamDown && _player != null && _player.IsHeavy)) return;
 
         if (ability) StartCoroutine(Ability(maskType, aimDir));
         else if (slamDown) StartCoroutine(SlamDown());
@@ -137,11 +150,15 @@ public class CombatSystem : MonoBehaviour
     {
         _isAttacking = true;
         Debug.Log("Starting Slam Down Attack");
+
         float slamDamage = _slamDownDamage;
+        slamShake.FeedbacksIntensity = 1;
 
         if (_player != null && _player.IsHeavy)
+        {
             slamDamage *= _heavySlamDamageMultiplier;
-        _rb = GetComponent<Rigidbody2D>();
+            slamShake.FeedbacksIntensity = 2;
+        }
 
         if (_rb != null)
         {
@@ -149,33 +166,27 @@ public class CombatSystem : MonoBehaviour
         }
 
         yield return StartCoroutine(Hit(_slamDownPoint.position, _slamDownRange * Vector2.one, _slamDownDuration));
-        List<PlayerController> hitEnemies = _hitEnemies;
-        foreach (PlayerController enemy in hitEnemies)
+
+        foreach (PlayerController enemy in _hitEnemies)
         {
             Debug.Log("Hit " + enemy.name);
-            // Apply damage or effects to the enemy here
             enemy.HandleGetHit(slamDamage, transform.position, _player);
         }
+
+        Debug.Log("Shaking that thang");
+        slamShake.PlayFeedbacks();
+
         _isAttacking = false;
     }
 
-    private IEnumerator Ability(MaskType maskType,Vector2 inputDirection)
-    {
-        _isAttacking = false;
-        Debug.Log("Starting Ability Attack");
 
-        yield return StartCoroutine(Hit(_abilityPoint.position, _abilityRange * Vector2.one, _abilityDuration));
-        /*
-        List<PlayerController> hitEnemies = _hitEnemies;
-        foreach (PlayerController enemy in hitEnemies)
+    private IEnumerator Ability(MaskType maskType, Vector2 inputDirection)
+    {
+        _currentAttackState = AttackState.Ability; // only this state, does NOT block melee/SlamDown
+        _isAttacking = true;
+
+        switch (maskType)
         {
-            Debug.Log("Hit " + enemy.name);
-            // Apply damage or effects to the enemy here
-        }*/
-        switch (maskType) 
-        { 
-            case MaskType.ANCHOR:
-                    break;
             case MaskType.DEFLECT:
                 Deflect();
                 break;
@@ -183,17 +194,23 @@ public class CombatSystem : MonoBehaviour
                 Heavy();
                 break;
             case MaskType.KAMIKAZE:
-                Kamikaze();
+                _currentAttackState = AttackState.Kamikaze; // now blocks everything
+                yield return StartCoroutine(KamikazeCoroutine());
                 break;
             case MaskType.DASH:
-               //yield return StartCoroutine(Dash());
+                _currentAttackState = AttackState.Dash; // blocks everything
+                yield return StartCoroutine(Dash(inputDirection, true));
                 break;
             case MaskType.STUN:
-                Stun(inputDirection); // You’ll pass aim direction here
+                Stun(inputDirection);
                 break;
         }
+
         _isAttacking = false;
+        if (_currentAttackState == AttackState.Ability) // reset only if still ability
+            _currentAttackState = AttackState.None;
     }
+
 
     // Get all enemies in range during the melee duration
     private IEnumerator Hit(Vector2 pos, Vector2 size, float duration)
@@ -204,25 +221,15 @@ public class CombatSystem : MonoBehaviour
         while (timer <= duration)
         {
             Collider2D[] hit = Physics2D.OverlapBoxAll(pos, size, 0);
-            if (hit.Length > 0)
+            foreach (Collider2D col in hit)
             {
-                for (int i = 0; i < hit.Length; i++)
-                {
-                    if (hit[i].gameObject == this.gameObject) continue;
-                    if (hit[i].TryGetComponent<PlayerController>(out PlayerController enemy))
-                    {
-                        if (!hitEnemies.Contains(enemy))
-                        {
-                            hitEnemies.Add(enemy);
-                        }
-                    }
-                }
+                if (col.gameObject == this.gameObject) continue;
+                if (col.TryGetComponent<PlayerController>(out PlayerController enemy) && !hitEnemies.Contains(enemy))
+                    hitEnemies.Add(enemy);
             }
-
             timer += Time.deltaTime;
             yield return null;
         }
-
         _hitEnemies = hitEnemies;
     }
 
@@ -244,6 +251,16 @@ public class CombatSystem : MonoBehaviour
 
     }
     //Mask Abilities:
+    /*
+    public bool IsBusy
+    {
+        get
+        {
+            // Only Dash or Kamikaze block all other attacks
+            return _currentAttackState == AttackState.Dash || _currentAttackState == AttackState.Kamikaze;
+        }
+    }*/
+
     private void Deflect()
     {
         StartCoroutine(DeflectCoroutine());
@@ -335,9 +352,10 @@ public class CombatSystem : MonoBehaviour
         rb.gravityScale = originalGravity;
         rb.linearVelocity *= 0.2f;
         transform.rotation = Quaternion.identity;
+        _isAttacking = false;
         player.SetDashing(false);
 
-        _isAttacking = false;
+        
     }
 
 
@@ -548,12 +566,6 @@ public class CombatSystem : MonoBehaviour
         Destroy(beam);
         _isAttacking = false;
     }
-
-
-
-
-
-
 
 
 

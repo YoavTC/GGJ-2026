@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private LayerMask _groundLayer;
 
     public List<MaskScriptableObjext> playerMasks = new List<MaskScriptableObjext>(3);
-    private MaskScriptableObjext currentMask;
+    public MaskScriptableObjext currentMask;
 
     // Input states
     Vector2 _move;
@@ -201,40 +201,33 @@ public class PlayerController : MonoBehaviour
 
     private void HandleCombat()
     {
-        if (!_canAttack) return;
+        // If currently dashing or Kamikaze coroutine is running, block attacks
+        if (_combatSystem.IsBusy) return;
 
-        if (_ability)
+        // Slam Down first (midair + down + melee)
+        if (_melee && !_ground && _move.y < -0.5f)
         {
-            if (_maskCooldownTimer <= 0f)
-            {
-                _canAttack = false;
-                _attackCooldownTimer = currentMask.maskCooldown;
-                _maskCooldownTimer = currentMask.maskCooldown;
-
-                Vector2 aimDir = _move.normalized; // use movement input as aim
-                _combatSystem.HandleCombat(false, false, true, currentMask.MaskType, aimDir);
-            }
-        }
-        else if (_melee)
-        {
-            if (!_ground && _move.y < -0.5f)
-            {
-                // Slam down attack
-                _canAttack = false;
-                _attackCooldownTimer = _slamDownCooldown;
-                _combatSystem.HandleCombat(melee: false, slamDown: true, ability: false, currentMask.MaskType);
-                _stunTimer = 0.5f;
-            }
-            else
-            {
-                // Normal melee
-                _canAttack = false;
-                _attackCooldownTimer = _meleeCooldown;
-                _combatSystem.HandleCombat(melee: true, slamDown: false, ability: false, currentMask.MaskType);
-            }
+            _combatSystem.HandleCombat(melee: false, slamDown: true, ability: false, currentMask.MaskType);
+            _attackCooldownTimer = _slamDownCooldown;
+            return;
         }
 
+        // Normal melee
+        if (_melee)
+        {
+            _combatSystem.HandleCombat(melee: true, slamDown: false, ability: false, currentMask.MaskType);
+            _attackCooldownTimer = _meleeCooldown;
+            return;
+        }
+
+        // Ability (respect cooldown)
+        if (_ability && _maskCooldownTimer <= 0f)
+        {
+            _maskCooldownTimer = currentMask.maskCooldown;
+            _combatSystem.HandleCombat(melee: false, slamDown: false, ability: true, currentMask.MaskType, _move.normalized);
+        }
     }
+
 
     public void HandleGetHit(float damage,Vector2 attackerPosition,PlayerController attacker=null) 
     {
