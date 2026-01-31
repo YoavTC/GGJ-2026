@@ -50,4 +50,10 @@ public class PlayerInstance : MonoBehaviour
         _player.gameObject.SetActive(true);
         _playerInput.SwitchCurrentActionMap("Player");
     }
+
+    public Vector3 GetRespawnPos()
+    {
+        Transform spawnPositionsParent = GameObject.FindGameObjectWithTag("PlayerSpawnPositions").transform;
+        return spawnPositionsParent.GetChild(Random.Range(0, spawnPositionsParent.childCount - 1)).position;
+    }
 }

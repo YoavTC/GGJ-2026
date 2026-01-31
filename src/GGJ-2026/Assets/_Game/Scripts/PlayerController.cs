@@ -312,15 +312,17 @@ public class PlayerController : MonoBehaviour
 
     public void HandleDeath()
     {
-        _isAlive = false;
-        _canMove = false;
-        _canAttack = false;
+        //_isAlive = false;
+        //_canMove = false;
+        //_canAttack = false;
 
         _livesRemaining--;
 
         if (_livesRemaining > 0)
         {
             currentMask = playerMasks.Dequeue();
+            knockbackPercentage = 0f;
+            transform.position = _playerInstance.GetRespawnPos();
         }
         else
         {
