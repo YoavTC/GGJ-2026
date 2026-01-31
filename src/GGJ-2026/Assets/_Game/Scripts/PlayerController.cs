@@ -88,7 +88,7 @@ public class PlayerController : MonoBehaviour
     private bool _isStunned;
     public bool IsStunned => _isStunned;
 
-
+    [SerializeField] private Animator _animator;
 
 
 
@@ -305,7 +305,8 @@ public class PlayerController : MonoBehaviour
         // Optional: prevent movement/attacks
         _canMove = false;
         _canAttack = false;
-
+        if (_animator != null)
+            _animator.SetBool("isStunned", true);
         StartCoroutine(StunCoroutine(duration));
     }
 
@@ -315,6 +316,10 @@ public class PlayerController : MonoBehaviour
         _isStunned = false;
         _canMove = true;
         _canAttack = true;
+
+        if (_animator != null)
+            _animator.SetBool("isStunned", false);
+        
     }
 
 }
