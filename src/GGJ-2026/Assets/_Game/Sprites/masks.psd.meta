@@ -101,9 +101,9 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 390
-        width: 338
-        height: 390
+        y: 453
+        width: 369
+        height: 452
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -122,10 +122,10 @@ TextureImporter:
       name: masks_1
       rect:
         serializedVersion: 2
-        x: 338
-        y: 390
-        width: 338
-        height: 390
+        x: 369
+        y: 453
+        width: 369
+        height: 452
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -144,10 +144,10 @@ TextureImporter:
       name: masks_2
       rect:
         serializedVersion: 2
-        x: 676
-        y: 390
-        width: 338
-        height: 390
+        x: 738
+        y: 453
+        width: 369
+        height: 452
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -166,10 +166,10 @@ TextureImporter:
       name: masks_3
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 338
-        height: 390
+        x: 1107
+        y: 453
+        width: 369
+        height: 452
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -188,10 +188,10 @@ TextureImporter:
       name: masks_4
       rect:
         serializedVersion: 2
-        x: 338
-        y: 0
-        width: 338
-        height: 390
+        x: 0
+        y: 1
+        width: 369
+        height: 452
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -210,10 +210,10 @@ TextureImporter:
       name: masks_5
       rect:
         serializedVersion: 2
-        x: 676
-        y: 0
-        width: 338
-        height: 390
+        x: 369
+        y: 1
+        width: 369
+        height: 452
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -224,6 +224,50 @@ TextureImporter:
       bones: []
       spriteID: f01d547860393fa48a73fe39c61d97fe
       internalID: 372077177
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: masks_6
+      rect:
+        serializedVersion: 2
+        x: 738
+        y: 1
+        width: 369
+        height: 452
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4930cecdd8b8d9c449659a53ba7b5837
+      internalID: 905939910
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: masks_7
+      rect:
+        serializedVersion: 2
+        x: 1107
+        y: 1
+        width: 369
+        height: 452
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c8acc574fde6ea9409a2efbeabfcd8a2
+      internalID: -810025039
       vertices: []
       indices: 
       edges: []
@@ -248,6 +292,8 @@ TextureImporter:
       masks_3: -64049637
       masks_4: 1454487945
       masks_5: 372077177
+      masks_6: 905939910
+      masks_7: -810025039
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
