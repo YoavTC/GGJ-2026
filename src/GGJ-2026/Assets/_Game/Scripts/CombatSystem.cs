@@ -503,7 +503,11 @@ public class CombatSystem : MonoBehaviour
             direction = new Vector2(Mathf.Sign(transform.localScale.x), 0f);
         direction.Normalize();
 
-        // Create the visual beam
+        // Start and end points
+        Vector3 start = transform.position;
+        Vector3 end = start + (Vector3)(direction * _stunRange);
+
+        // === Spawn Visual Beam ===
         GameObject beam = new GameObject("StunBeam");
         LineRenderer lr = beam.AddComponent<LineRenderer>();
         lr.positionCount = 2;
@@ -512,20 +516,19 @@ public class CombatSystem : MonoBehaviour
         lr.material = new Material(Shader.Find("Sprites/Default"));
         lr.startColor = Color.cyan;
         lr.endColor = Color.cyan;
-
-        Vector3 start = transform.position;
-        Vector3 end = start + (Vector3)(direction * _stunRange);
-
         lr.SetPosition(0, start);
         lr.SetPosition(1, end);
 
-        // Optional: parent to player so it moves if player moves
-        beam.transform.parent = transform;
+        beam.transform.parent = transform; // optional
 
-        // Deal stun to enemies along line
-        Vector2 center = (start + end) / 2f;
-        Vector2 size = new Vector2(_stunWidth, _stunRange);
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        // === Stun Hitbox ===
+        float beamLength = Vector2.Distance(start, end);
+
+        // Center of box = midpoint
+        Vector2 center = (Vector2)start + direction * (beamLength / 2f);
+        // Size of box: width = stun width, height = beam length
+        Vector2 size = new Vector2(_stunWidth, beamLength);
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f; // rotate because OverlapBox treats y as height
 
         Collider2D[] hits = Physics2D.OverlapBoxAll(center, size, angle);
         foreach (Collider2D col in hits)
@@ -540,7 +543,6 @@ public class CombatSystem : MonoBehaviour
             }
         }
 
-        // Keep beam visible briefly
         yield return new WaitForSeconds(_stunBeamDuration);
 
         Destroy(beam);
