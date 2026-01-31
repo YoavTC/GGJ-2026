@@ -86,8 +86,8 @@ public class PlayerController : MonoBehaviour
     private bool _isStunned;
     public bool IsStunned => _isStunned;
 
-   
 
+    [SerializeField] private Animator _animator;
 
 
 
@@ -300,7 +300,11 @@ public class PlayerController : MonoBehaviour
         if (_isStunned) return;
         _isStunned = true;
 
+
         // Optional: prevent movement/attacks
+        // Stop Slam Animation
+        if (_animator != null)
+            _animator.SetBool("isStunned", true);
         _canMove = false;
         _canAttack = false;
 
@@ -313,6 +317,8 @@ public class PlayerController : MonoBehaviour
         _isStunned = false;
         _canMove = true;
         _canAttack = true;
+        if (_animator != null)
+            _animator.SetBool("isStunned", false);
     }
 
 }

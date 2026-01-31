@@ -86,7 +86,7 @@ public class CombatSystem : MonoBehaviour
     [HideInInspector] public bool _isAttacking;
     [HideInInspector] public AttackState _currentAttackState = AttackState.None;
     public bool IsBusy => _isAttacking; // only true while Dash/Kamikaze coroutine runs
-
+    [SerializeField] private Animator _animator;
 
 
     private List<PlayerController> _hitEnemies = new List<PlayerController>();
@@ -133,6 +133,9 @@ public class CombatSystem : MonoBehaviour
     private IEnumerator Melee()
     {
         _isAttacking = true;
+        if (_animator != null)
+            _animator.SetBool("isPunching", true);
+
         Debug.Log("Starting Melee Attack");
         yield return StartCoroutine(
             Hit(_meleePoint.position, _meleeRange * Vector2.one, _meleeDuration));
@@ -143,12 +146,17 @@ public class CombatSystem : MonoBehaviour
             // Apply damage or effects to the enemy here
             enemy.HandleGetHit(_meleeDamage, transform.position, GetComponent<PlayerController>());
         }
+
+        if (_animator != null)
+            _animator.SetBool("isPunching", false);
         _isAttacking = false;
     }
 
     private IEnumerator SlamDown()
     {
         _isAttacking = true;
+        if (_animator != null)
+            _animator.SetBool("isSlamming", true);
         Debug.Log("Starting Slam Down Attack");
 
         float slamDamage = _slamDownDamage;
@@ -176,6 +184,9 @@ public class CombatSystem : MonoBehaviour
         Debug.Log("Shaking that thang");
         slamShake.PlayFeedbacks();
 
+        // Stop Slam Animation
+        if (_animator != null)
+            _animator.SetBool("isSlamming", false);
         _isAttacking = false;
     }
 
