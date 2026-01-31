@@ -310,6 +310,9 @@ MonoBehaviour:
   - {fileID: -1964691417, guid: 599346e01e0ba0c44b78391fddb9e86f, type: 3}
   - {fileID: 144846507, guid: 599346e01e0ba0c44b78391fddb9e86f, type: 3}
   - {fileID: -1973355738, guid: 599346e01e0ba0c44b78391fddb9e86f, type: 3}
+  _selectMaskElementAnimateScale: -0.2
+  _selectMaskElementAnimateDuration: 0.1
+  _selectMaskElementAnimateEase: 25
 --- !u!1 &156960688
 GameObject:
   m_ObjectHideFlags: 0

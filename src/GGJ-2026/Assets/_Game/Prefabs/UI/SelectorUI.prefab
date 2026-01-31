@@ -99,6 +99,16 @@ MonoBehaviour:
   - {fileID: 743908124410969145}
   emptySlotSprite: {fileID: 905939910, guid: e31b7299da048ac44a19ba5f212a26c6, type: 3}
   _moveCooldown: 0.2
+  _moveTweenSettings:
+    delay: 0
+    duration: 0.2
+    ease: 22
+    invokeEventOnComplete: 0
+    onComplete:
+      m_PersistentCalls:
+        m_Calls: []
+    loops: 0
+    loopType: 0
 --- !u!114 &5372322741777799241
 MonoBehaviour:
   m_ObjectHideFlags: 0

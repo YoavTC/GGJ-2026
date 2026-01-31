@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -14,7 +15,7 @@ public class SelectorUI : MonoBehaviour
     [SerializeField] private List<Image> slotImages;
     [SerializeField] private Sprite emptySlotSprite;
 
-    private Action onMaskSelect;
+    private Action<GameObject, MaskUIReference> onMaskSelect;
     private Color color;
     private Sprite selectorSprite;
     private Transform canvasTransform;
@@ -27,6 +28,8 @@ public class SelectorUI : MonoBehaviour
     int _currentIndex;
     float _lastMoveTime = -Mathf.Infinity;
     [SerializeField] private float _moveCooldown = 0.2f;
+    [SerializeField] private TweenSettings _moveTweenSettings;
+
     private enum Direction
     {
         LEFT, // -1
@@ -39,7 +42,7 @@ public class SelectorUI : MonoBehaviour
 
     // Called by CharacterSelectScreen when setting up
     public void Init(
-            Action onMaskSelect,
+            Action<GameObject, MaskUIReference> onMaskSelect,
             Color color,
             Sprite selectorSprite,
             Transform canvasTransform,
@@ -76,7 +79,7 @@ public class SelectorUI : MonoBehaviour
         windowImg.color = color;
 
         yield return null; // wait one frame to ensure layout is updated
-        SetPosition(UnityEngine.Random.Range(0, masksGridParentTransform.childCount - 1));
+        SetPosition(UnityEngine.Random.Range(0, masksGridParentTransform.childCount - 1), false);
 
         setupFinished = true;
     }
@@ -100,8 +103,8 @@ public class SelectorUI : MonoBehaviour
     {
         if (!ctx.performed || !setupFinished) return;
         Debug.Log("Submit pressed on index " + _currentIndex);
-        onMaskSelect?.Invoke();
-        MaskScriptableObjext mask = masksGridParentTransform.GetChild(_currentIndex).GetComponent<MaskUIReference>().mask;
+        MaskUIReference maskElement = masksGridParentTransform.GetChild(_currentIndex).GetComponent<MaskUIReference>();
+        MaskScriptableObjext mask = maskElement.mask;
 
         if (masks.Contains(mask)) return;
         if (masks.Count == 3)
@@ -109,6 +112,7 @@ public class SelectorUI : MonoBehaviour
             masks.Dequeue();
         }
 
+        onMaskSelect?.Invoke(gameObject, maskElement);
         masks.Enqueue(mask);
         UpdateSelectedMasksUI();
     }
@@ -164,9 +168,11 @@ public class SelectorUI : MonoBehaviour
         }
     }
 
-    private void SetPosition(int index)
+    private void SetPosition(int index, bool playAnimation = true)
     {
-        selector.position = masksPositionsGridParentTransform.GetChild(index).position;
+        selector.DOMove(masksPositionsGridParentTransform.GetChild(index).position,
+            playAnimation ? _moveTweenSettings.duration : 0f)
+                .SetAs(_moveTweenSettings.GetParams());
         _currentIndex = index;
     }
 

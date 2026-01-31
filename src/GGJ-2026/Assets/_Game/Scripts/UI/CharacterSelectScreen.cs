@@ -1,3 +1,4 @@
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -12,9 +13,16 @@ public class CharacterSelectScreen : MonoBehaviour
     [SerializeField] private Color[] _colors;
     [SerializeField] private Sprite[] _selectorIndicatorSprites;
 
-    public void SelectMask(GameObject mask)
+    [SerializeField] private float _selectMaskElementAnimateScale;
+    [SerializeField] private float _selectMaskElementAnimateDuration;
+    [SerializeField] private Ease _selectMaskElementAnimateEase;
+
+    public void SelectMask(GameObject selectorUI, MaskUIReference maskElement)
     {
-        Debug.Log($"Selected mask: {mask.name}");
+        Debug.Log($"Selected mask: {maskElement.mask.MaskName}");
+        maskElement.gameObject.transform
+            .DOPunchScale(Vector3.one * _selectMaskElementAnimateScale, _selectMaskElementAnimateDuration)
+            .SetEase(_selectMaskElementAnimateEase);
     }
 
     public void OnPlayerJoined(PlayerInput playerInput)
@@ -22,7 +30,7 @@ public class CharacterSelectScreen : MonoBehaviour
         playerInput.transform.SetParent(_selectorsGridParentTransform, false);
         SelectorUI selectorUI = playerInput.gameObject.GetComponent<SelectorUI>();
         selectorUI.Init(
-            () => SelectMask(playerInput.gameObject),
+            (selectorUI, maskElement) => SelectMask(selectorUI, maskElement),
             _colors[_playerInputManager.playerCount - 1],
             _selectorIndicatorSprites[_playerInputManager.playerCount - 1],
             _canvasTransform,
