@@ -325,7 +325,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   playerMasks:
-  - {fileID: 11400000, guid: e93472702c39420439f7083398cc4a85, type: 2}
+  - {fileID: 11400000, guid: 7345b5e5e10ae104e9ae6df3b8abcae3, type: 2}
   currentMask: {fileID: 0}
   _meleeCooldown: 0.5
   _slamDownCooldown: 1
@@ -412,7 +412,7 @@ MonoBehaviour:
   _slamDownPoint: {fileID: 5304658051075657372}
   _slamDownDuration: 0
   _slamDownRange: {x: 3.3, y: 1}
-  _slamDownForce: 10
+  _slamDownForce: 25
   _slamDownDamage: 10
   slamShake: {fileID: 8471680566101258377}
   _abilityPoint: {fileID: 7919086636908481488}
@@ -463,7 +463,7 @@ MonoBehaviour:
   _stunCooldown: 0.5
   _stunDamage: 0
   _stunBeamPrefab: {fileID: 106988, guid: a9892f6a83fd8d4468ce0c8a3d09d3cd, type: 3}
-  _stunBeamDuration: 0.2
+  _stunBeamDuration: 0.5
   _stunBeamWidth: 0.15
   _stunBeamOrigin: {fileID: 5602912716455476835}
   _isAttacking: 0

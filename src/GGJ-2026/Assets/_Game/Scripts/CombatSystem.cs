@@ -1,4 +1,4 @@
-using DigitalRuby.LightningBolt;
+﻿using DigitalRuby.LightningBolt;
 using MoreMountains.Feedbacks;
 using System.Collections;
 using System.Collections.Generic;
@@ -323,7 +323,9 @@ public class CombatSystem : MonoBehaviour
             yield break;
 
         player.SetDashing(true);
-
+        /*
+        if (_animator != null)
+            _animator.SetBool("isDashing", true);*/
         // Save physics
         float originalGravity = rb.gravityScale;
         rb.gravityScale = 0f;
@@ -363,6 +365,11 @@ public class CombatSystem : MonoBehaviour
         rb.gravityScale = originalGravity;
         rb.linearVelocity *= 0.2f;
         transform.rotation = Quaternion.identity;
+
+        // 🔹 END DASH ANIMATION
+        if (_animator != null)
+            _animator.SetBool("isDashing", false);
+
         _isAttacking = false;
         player.SetDashing(false);
 
@@ -523,6 +530,9 @@ public class CombatSystem : MonoBehaviour
     private IEnumerator StunCoroutine(Vector2 direction)
     {
         _isAttacking = true;
+        if (_animator != null) { 
+            _animator.SetBool("isStunAbility",true);
+        }
 
         PlayerController player = GetComponent<PlayerController>();
         if (player == null) yield break;
@@ -576,6 +586,10 @@ public class CombatSystem : MonoBehaviour
 
         Destroy(beam);
         _isAttacking = false;
+        if (_animator != null)
+        {
+            _animator.SetBool("isStunAbility", false);
+        }
     }
 
 
