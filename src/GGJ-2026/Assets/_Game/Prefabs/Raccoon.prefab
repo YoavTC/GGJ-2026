@@ -483,10 +483,10 @@ MonoBehaviour:
   _rb: {fileID: 1918372443166222752}
   _gravity: 60
   _swingDamping: 0.05
-  _playerSwingPower: 20
+  _playerSwingPower: 65
   _ropeTension: 2
   _maxSwingVelocity: 50
-  _detectionRadius: 1
+  _detectionRadius: 3
   _releaseBoost: 1.5
   _debugReleaseKey: 101
 --- !u!1 &1818547886868318250
