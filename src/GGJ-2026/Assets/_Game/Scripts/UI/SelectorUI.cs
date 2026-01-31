@@ -80,9 +80,11 @@ public class SelectorUI : MonoBehaviour
         Image windowImg = windowTransform.GetComponent<Image>();
         windowImg.color = color;
 
+        selectorImg.enabled = false;
         yield return null; // wait one frame to ensure layout is updated
         SetPosition(UnityEngine.Random.Range(0, masksGridParentTransform.childCount - 1), false);
-
+        yield return null; // wait one frame to ensure layout is updated
+        selectorImg.enabled = true;
         setupFinished = true;
     }
 
