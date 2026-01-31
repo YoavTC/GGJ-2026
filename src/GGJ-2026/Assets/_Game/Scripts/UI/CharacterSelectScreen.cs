@@ -10,6 +10,7 @@ public class CharacterSelectScreen : MonoBehaviour
     [SerializeField] private Transform _masksGridParentTransform;
     [SerializeField] private Transform _selectorsGridParentTransform;
     [SerializeField] private PlayerInputManager _playerInputManager;
+    [SerializeField] private Camera _mainCamera;
 
     [SerializeField] private Color[] _colors;
     [SerializeField] private Sprite[] _selectorIndicatorSprites;
@@ -35,7 +36,7 @@ public class CharacterSelectScreen : MonoBehaviour
 
     public void OnPlayerJoined(PlayerInput playerInput)
     {
-        Debug.Log("CALL");
+        DontDestroyOnLoad(playerInput.gameObject);
         SelectorUI selectorUI = playerInput.gameObject.GetComponent<PlayerInstance>().SelectorUI;
         Debug.Log(selectorUI);
         selectorUI.transform.SetParent(_selectorsGridParentTransform, false);
@@ -62,6 +63,7 @@ public class CharacterSelectScreen : MonoBehaviour
             }
         }
 
+        //Destroy(_mainCamera.gameObject);
         Bootstrap.Instance.ChangeState(GameState.IN_GAME);
     }
 

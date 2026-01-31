@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -10,6 +9,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private MovementSystem _movementSystem;
     [SerializeField] private CombatSystem _combatSystem;
     [SerializeField] private RopeSwingSystem _ropeSwingSystem;
+    [SerializeField] private PlayerInput _playerInput;
+
+    public PlayerInput PlayerInput => _playerInput;
 
     [Header("Ground Check")]
     [SerializeField] private float _groundCheckRadius = 0.1f;
@@ -86,7 +88,7 @@ public class PlayerController : MonoBehaviour
     private bool _isStunned;
     public bool IsStunned => _isStunned;
 
-   
+
 
 
 
@@ -167,7 +169,7 @@ public class PlayerController : MonoBehaviour
         {
             return;
         }
-       
+
         _movementSystem.HandleMovement(_ground, _jump, _move, _knockbackData, IsHeavy);
         _knockbackData = KnockbackData.Empty;
         _jump = false;
@@ -185,7 +187,7 @@ public class PlayerController : MonoBehaviour
                 _ropeSwingSystem.ReleaseRope();
                 _jump = false;
             }
-            
+
             _ropeSwingSystem.ApplyPlayerControl(_move.x);
         }
         else
@@ -229,7 +231,7 @@ public class PlayerController : MonoBehaviour
     }
 
 
-    public void HandleGetHit(float damage,Vector2 attackerPosition,PlayerController attacker=null) 
+    public void HandleGetHit(float damage, Vector2 attackerPosition, PlayerController attacker = null)
     {
         if (IsDeflecting && attacker != null)
         {
@@ -239,7 +241,7 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        Debug.Log("Fuck I'm Hit "+damage);
+        Debug.Log("Fuck I'm Hit " + damage);
         knockbackPercentage += damage;
 
         Rigidbody2D rb = GetComponent<Rigidbody2D>();
@@ -263,7 +265,7 @@ public class PlayerController : MonoBehaviour
 
         // Calculate final force
         //float force = Mathf.Pow(knockbackPercentage + damage, 1.1f) * knockbackForceMultiplier;
-        float force =Mathf.Pow(knockbackPercentage + damage, 1.15f)* knockbackForceMultiplier * KnockbackResistanceMultiplier;
+        float force = Mathf.Pow(knockbackPercentage + damage, 1.15f) * knockbackForceMultiplier * KnockbackResistanceMultiplier;
         Debug.DrawRay(transform.position, direction * 3f, Color.red, 1f);
 
         // Apply knockback
@@ -277,7 +279,7 @@ public class PlayerController : MonoBehaviour
     public void SetDeflecting(bool value)
     {
         IsDeflecting = value;
-        if (IsDeflecting) { deflectBubble.SetActive(true); }else{ deflectBubble.SetActive(false); }
+        if (IsDeflecting) { deflectBubble.SetActive(true); } else { deflectBubble.SetActive(false); }
     }
 
     public void SetHeavy(bool value)
@@ -289,7 +291,7 @@ public class PlayerController : MonoBehaviour
     {
         if (!_isDashing) return;
 
-        if (collision.gameObject.TryGetComponent<PlayerController>(out var enemy))
+        if (collision.gameObject.TryGetComponent<PlayerController>(out PlayerController enemy))
         {
             enemy.HandleGetHit(30f, transform.position);
         }

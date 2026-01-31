@@ -39,6 +39,8 @@ public class Bootstrap : MonoBehaviour
                 break;
             case GameState.IN_GAME:
                 SceneManager.LoadScene(gameScene);
+                PlayerInstance[] players = FindObjectsByType<PlayerInstance>(FindObjectsSortMode.None);
+                foreach (PlayerInstance player in players) player.OnGameSceneLoad();
                 break;
         }
     }
