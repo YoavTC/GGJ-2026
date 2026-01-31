@@ -107,20 +107,6 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         if (!_isAlive) return;
-        if (!_isAlive)
-        {
-            if (_livesRemaining == 0)
-            {
-                Debug.Log("Kill player..");
-                // Remove component
-                return;
-            }
-
-            // Respawn player
-            Debug.Log("Respawn player..");
-            return;
-        }
-
         if (_attackCooldownTimer > 0f)
         {
             _attackCooldownTimer -= Time.deltaTime;
