@@ -310,7 +310,7 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    public void HandleDeath()
+    public bool HandleDeath()
     {
         //_isAlive = false;
         //_canMove = false;
@@ -323,12 +323,10 @@ public class PlayerController : MonoBehaviour
             currentMask = playerMasks.Dequeue();
             knockbackPercentage = 0f;
             transform.position = _playerInstance.GetRespawnPos();
-        }
-        else
-        {
-            Debug.Log($"{name} has no lives remaining.");
+            return false;
         }
 
         Debug.Log($"{name} has died.");
+        return true;
     }
 }

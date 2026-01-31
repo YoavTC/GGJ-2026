@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Deathzone : MonoBehaviour
 {
@@ -8,7 +9,11 @@ public class Deathzone : MonoBehaviour
         {
             if (player != null)
             {
-                player.HandleDeath();
+                bool res = player.HandleDeath();
+                if (res)
+                {
+                    SceneManager.LoadScene("Death");
+                }
             }
         }
     }
