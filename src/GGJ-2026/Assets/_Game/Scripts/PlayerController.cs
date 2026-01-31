@@ -107,20 +107,6 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         if (!_isAlive) return;
-        if (!_isAlive)
-        {
-            if (_livesRemaining == 0)
-            {
-                Debug.Log("Kill player..");
-                // Remove component
-                return;
-            }
-
-            // Respawn player
-            Debug.Log("Respawn player..");
-            return;
-        }
-
         if (_attackCooldownTimer > 0f)
         {
             _attackCooldownTimer -= Time.deltaTime;
@@ -324,23 +310,23 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    public void HandleDeath()
+    public bool HandleDeath()
     {
-        _isAlive = false;
-        _canMove = false;
-        _canAttack = false;
+        //_isAlive = false;
+        //_canMove = false;
+        //_canAttack = false;
 
         _livesRemaining--;
 
         if (_livesRemaining > 0)
         {
             currentMask = playerMasks.Dequeue();
-        }
-        else
-        {
-            Debug.Log($"{name} has no lives remaining.");
+            knockbackPercentage = 0f;
+            transform.position = _playerInstance.GetRespawnPos();
+            return false;
         }
 
         Debug.Log($"{name} has died.");
+        return true;
     }
 }
