@@ -273,7 +273,7 @@ MonoBehaviour:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_Reference: {fileID: 0}
-  m_PlayerPrefab: {fileID: 105618699873419958, guid: da686c0478313704f90103c33893be9e, type: 3}
+  m_PlayerPrefab: {fileID: 7707966012228190986, guid: 2057ae9e7d03d8a4c94e9dfab2918811, type: 3}
   m_SplitScreen: 0
   m_MaintainAspectRatioInSplitScreen: 0
   m_FixedNumberOfSplitScreens: -1
@@ -3078,7 +3078,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1487816747}
   - component: {fileID: 1487816746}
-  - component: {fileID: 1487816745}
   - component: {fileID: 1487816744}
   m_Layer: 0
   m_Name: Camera
@@ -3131,14 +3130,6 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
---- !u!81 &1487816745
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1487816743}
-  m_Enabled: 1
 --- !u!20 &1487816746
 Camera:
   m_ObjectHideFlags: 0

@@ -24,6 +24,8 @@ public class SelectorUI : MonoBehaviour
 
     private Queue<MaskScriptableObjext> masks = new Queue<MaskScriptableObjext>(3);
 
+    public bool hasSelectedMasks => masks.Count > 1;
+
     int _maskCount;
     int _currentIndex;
     float _lastMoveTime = -Mathf.Infinity;

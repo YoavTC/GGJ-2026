@@ -165,7 +165,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainMenuScene: 
   maskSelectScene: 
-  gameScene: 
+  gameScene: Movement
+  defaultGameState: 2
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

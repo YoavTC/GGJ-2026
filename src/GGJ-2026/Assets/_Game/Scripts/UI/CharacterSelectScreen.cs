@@ -1,3 +1,4 @@
+using System.Collections;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -23,12 +24,22 @@ public class CharacterSelectScreen : MonoBehaviour
         maskElement.gameObject.transform
             .DOPunchScale(Vector3.one * _selectMaskElementAnimateScale, _selectMaskElementAnimateDuration)
             .SetEase(_selectMaskElementAnimateEase);
+
+        // Check if should start
+        if (_playerInputManager.playerCount > 1 && allPlayersReady())
+        {
+            StopAllCoroutines();
+            StartCoroutine(StartGame());
+        }
     }
 
     public void OnPlayerJoined(PlayerInput playerInput)
     {
-        playerInput.transform.SetParent(_selectorsGridParentTransform, false);
-        SelectorUI selectorUI = playerInput.gameObject.GetComponent<SelectorUI>();
+        Debug.Log("CALL");
+        SelectorUI selectorUI = playerInput.gameObject.GetComponent<PlayerInstance>().SelectorUI;
+        Debug.Log(selectorUI);
+        selectorUI.transform.SetParent(_selectorsGridParentTransform, false);
+        Debug.Log(selectorUI);
         selectorUI.Init(
             (selectorUI, maskElement) => SelectMask(selectorUI, maskElement),
             _colors[_playerInputManager.playerCount - 1],
@@ -36,5 +47,39 @@ public class CharacterSelectScreen : MonoBehaviour
             _canvasTransform,
             _masksPositionsGridParentTransform,
             _masksGridParentTransform);
+    }
+
+    public IEnumerator StartGame()
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            Debug.Log($"Starting game in {5 - i}...");
+            yield return new WaitForSeconds(1);
+            if (!allPlayersReady())
+            {
+                Debug.Log("A player unselected a mask, cancelling game start.");
+                yield break;
+            }
+        }
+
+        Bootstrap.Instance.ChangeState(GameState.IN_GAME);
+    }
+
+    private bool allPlayersReady()
+    {
+        SelectorUI[] selectors = _selectorsGridParentTransform.GetComponentsInChildren<SelectorUI>();
+        Debug.Log($"Number of selectors: {selectors.Length}");
+        foreach (SelectorUI selector in selectors)
+        {
+            Debug.Log(selector);
+            if (!selector.hasSelectedMasks)
+            {
+                Debug.Log("A player has not selected masks yet.");
+                return false;
+            }
+        }
+
+        Debug.Log("All players have selected masks.");
+        return true;
     }
 }
