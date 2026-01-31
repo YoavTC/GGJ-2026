@@ -1,10 +1,20 @@
 using DigitalRuby.LightningBolt;
+using MoreMountains.Feedbacks;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class CombatSystem : MonoBehaviour
 {
+    public enum AttackState
+    {
+        None,
+        Melee,
+        SlamDown,
+        Ability,
+        Dash,
+        Kamikaze
+    }
     [Header("Melee Attack Settings")]
     [SerializeField] private Transform _meleePoint;
     [SerializeField] private float _meleeDuration;
@@ -17,6 +27,7 @@ public class CombatSystem : MonoBehaviour
     [SerializeField] private Vector2 _slamDownRange;
     [SerializeField] private float _slamDownForce = 20f; // tweak to feel right
     [SerializeField] private float _slamDownDamage = 10f; // tweak to feel right
+    [SerializeField] private MMF_Player slamShake;
     private Rigidbody2D _rb;
 
     [Header("Ability Attack Settings")]
@@ -24,7 +35,7 @@ public class CombatSystem : MonoBehaviour
     [SerializeField] private float _abilityDuration;
     [SerializeField] private Vector2 _abilityRange;
 
-    private bool _isAttacking;
+   // private bool _isAttacking;
     [SerializeField] private float _deflectDuration = 0.5f;
 
     [Header("Heavy Mask Settings")]
@@ -72,8 +83,10 @@ public class CombatSystem : MonoBehaviour
     [Header("Stun Beam Settings")]
     [SerializeField] private Transform _stunBeamOrigin; // assign in inspector
 
-
-
+    [HideInInspector] public bool _isAttacking;
+    [HideInInspector] public AttackState _currentAttackState = AttackState.None;
+    public bool IsBusy => _isAttacking; // only true while Dash/Kamikaze coroutine runs
+    [SerializeField] private Animator _animator;
 
 
     private List<PlayerController> _hitEnemies = new List<PlayerController>();
@@ -110,7 +123,7 @@ public class CombatSystem : MonoBehaviour
     public void HandleCombat(bool melee, bool slamDown, bool ability, MaskType maskType, Vector2 aimDir = default)
 
     {
-        if (_isAttacking) return;
+        if (_isAttacking && !(slamDown && _player != null && _player.IsHeavy)) return;
 
         if (ability) StartCoroutine(Ability(maskType, aimDir));
         else if (slamDown) StartCoroutine(SlamDown());
@@ -120,6 +133,9 @@ public class CombatSystem : MonoBehaviour
     private IEnumerator Melee()
     {
         _isAttacking = true;
+        if (_animator != null)
+            _animator.SetBool("isPunching", true);
+
         Debug.Log("Starting Melee Attack");
         yield return StartCoroutine(
             Hit(_meleePoint.position, _meleeRange * Vector2.one, _meleeDuration));
@@ -130,18 +146,27 @@ public class CombatSystem : MonoBehaviour
             // Apply damage or effects to the enemy here
             enemy.HandleGetHit(_meleeDamage, transform.position, GetComponent<PlayerController>());
         }
+
+        if (_animator != null)
+            _animator.SetBool("isPunching", false);
         _isAttacking = false;
     }
 
     private IEnumerator SlamDown()
     {
         _isAttacking = true;
+        if (_animator != null)
+            _animator.SetBool("isSlamming", true);
         Debug.Log("Starting Slam Down Attack");
+
         float slamDamage = _slamDownDamage;
+        slamShake.FeedbacksIntensity = 1;
 
         if (_player != null && _player.IsHeavy)
+        {
             slamDamage *= _heavySlamDamageMultiplier;
-        _rb = GetComponent<Rigidbody2D>();
+            slamShake.FeedbacksIntensity = 2;
+        }
 
         if (_rb != null)
         {
@@ -149,33 +174,30 @@ public class CombatSystem : MonoBehaviour
         }
 
         yield return StartCoroutine(Hit(_slamDownPoint.position, _slamDownRange * Vector2.one, _slamDownDuration));
-        List<PlayerController> hitEnemies = _hitEnemies;
-        foreach (PlayerController enemy in hitEnemies)
+
+        foreach (PlayerController enemy in _hitEnemies)
         {
             Debug.Log("Hit " + enemy.name);
-            // Apply damage or effects to the enemy here
             enemy.HandleGetHit(slamDamage, transform.position, _player);
         }
+
+        Debug.Log("Shaking that thang");
+        slamShake.PlayFeedbacks();
+
+        // Stop Slam Animation
+        if (_animator != null)
+            _animator.SetBool("isSlamming", false);
         _isAttacking = false;
     }
 
-    private IEnumerator Ability(MaskType maskType,Vector2 inputDirection)
-    {
-        _isAttacking = false;
-        Debug.Log("Starting Ability Attack");
 
-        yield return StartCoroutine(Hit(_abilityPoint.position, _abilityRange * Vector2.one, _abilityDuration));
-        /*
-        List<PlayerController> hitEnemies = _hitEnemies;
-        foreach (PlayerController enemy in hitEnemies)
+    private IEnumerator Ability(MaskType maskType, Vector2 inputDirection)
+    {
+        _currentAttackState = AttackState.Ability; // only this state, does NOT block melee/SlamDown
+        _isAttacking = true;
+
+        switch (maskType)
         {
-            Debug.Log("Hit " + enemy.name);
-            // Apply damage or effects to the enemy here
-        }*/
-        switch (maskType) 
-        { 
-            case MaskType.ANCHOR:
-                    break;
             case MaskType.DEFLECT:
                 Deflect();
                 break;
@@ -183,17 +205,23 @@ public class CombatSystem : MonoBehaviour
                 Heavy();
                 break;
             case MaskType.KAMIKAZE:
-                Kamikaze();
+                _currentAttackState = AttackState.Kamikaze; // now blocks everything
+                yield return StartCoroutine(KamikazeCoroutine());
                 break;
             case MaskType.DASH:
-               //yield return StartCoroutine(Dash());
+                _currentAttackState = AttackState.Dash; // blocks everything
+                yield return StartCoroutine(Dash(inputDirection, true));
                 break;
             case MaskType.STUN:
-                Stun(inputDirection); // You’ll pass aim direction here
+                Stun(inputDirection);
                 break;
         }
+
         _isAttacking = false;
+        if (_currentAttackState == AttackState.Ability) // reset only if still ability
+            _currentAttackState = AttackState.None;
     }
+
 
     // Get all enemies in range during the melee duration
     private IEnumerator Hit(Vector2 pos, Vector2 size, float duration)
@@ -204,25 +232,15 @@ public class CombatSystem : MonoBehaviour
         while (timer <= duration)
         {
             Collider2D[] hit = Physics2D.OverlapBoxAll(pos, size, 0);
-            if (hit.Length > 0)
+            foreach (Collider2D col in hit)
             {
-                for (int i = 0; i < hit.Length; i++)
-                {
-                    if (hit[i].gameObject == this.gameObject) continue;
-                    if (hit[i].TryGetComponent<PlayerController>(out PlayerController enemy))
-                    {
-                        if (!hitEnemies.Contains(enemy))
-                        {
-                            hitEnemies.Add(enemy);
-                        }
-                    }
-                }
+                if (col.gameObject == this.gameObject) continue;
+                if (col.TryGetComponent<PlayerController>(out PlayerController enemy) && !hitEnemies.Contains(enemy))
+                    hitEnemies.Add(enemy);
             }
-
             timer += Time.deltaTime;
             yield return null;
         }
-
         _hitEnemies = hitEnemies;
     }
 
@@ -244,6 +262,16 @@ public class CombatSystem : MonoBehaviour
 
     }
     //Mask Abilities:
+    /*
+    public bool IsBusy
+    {
+        get
+        {
+            // Only Dash or Kamikaze block all other attacks
+            return _currentAttackState == AttackState.Dash || _currentAttackState == AttackState.Kamikaze;
+        }
+    }*/
+
     private void Deflect()
     {
         StartCoroutine(DeflectCoroutine());
@@ -335,9 +363,10 @@ public class CombatSystem : MonoBehaviour
         rb.gravityScale = originalGravity;
         rb.linearVelocity *= 0.2f;
         transform.rotation = Quaternion.identity;
+        _isAttacking = false;
         player.SetDashing(false);
 
-        _isAttacking = false;
+        
     }
 
 
@@ -503,7 +532,11 @@ public class CombatSystem : MonoBehaviour
             direction = new Vector2(Mathf.Sign(transform.localScale.x), 0f);
         direction.Normalize();
 
-        // Create the visual beam
+        // Start and end points
+        Vector3 start = transform.position;
+        Vector3 end = start + (Vector3)(direction * _stunRange);
+
+        // === Spawn Visual Beam ===
         GameObject beam = new GameObject("StunBeam");
         LineRenderer lr = beam.AddComponent<LineRenderer>();
         lr.positionCount = 2;
@@ -512,20 +545,19 @@ public class CombatSystem : MonoBehaviour
         lr.material = new Material(Shader.Find("Sprites/Default"));
         lr.startColor = Color.cyan;
         lr.endColor = Color.cyan;
-
-        Vector3 start = transform.position;
-        Vector3 end = start + (Vector3)(direction * _stunRange);
-
         lr.SetPosition(0, start);
         lr.SetPosition(1, end);
 
-        // Optional: parent to player so it moves if player moves
-        beam.transform.parent = transform;
+        beam.transform.parent = transform; // optional
 
-        // Deal stun to enemies along line
-        Vector2 center = (start + end) / 2f;
-        Vector2 size = new Vector2(_stunWidth, _stunRange);
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        // === Stun Hitbox ===
+        float beamLength = Vector2.Distance(start, end);
+
+        // Center of box = midpoint
+        Vector2 center = (Vector2)start + direction * (beamLength / 2f);
+        // Size of box: width = stun width, height = beam length
+        Vector2 size = new Vector2(_stunWidth, beamLength);
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f; // rotate because OverlapBox treats y as height
 
         Collider2D[] hits = Physics2D.OverlapBoxAll(center, size, angle);
         foreach (Collider2D col in hits)
@@ -540,18 +572,11 @@ public class CombatSystem : MonoBehaviour
             }
         }
 
-        // Keep beam visible briefly
         yield return new WaitForSeconds(_stunBeamDuration);
 
         Destroy(beam);
         _isAttacking = false;
     }
-
-
-
-
-
-
 
 
 

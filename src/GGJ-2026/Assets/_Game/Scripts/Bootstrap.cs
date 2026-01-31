@@ -3,36 +3,51 @@ using UnityEngine.SceneManagement;
 
 public class Bootstrap : MonoBehaviour
 {
+    public static Bootstrap Instance { get; private set; }
+
     [SerializeField] private string mainMenuScene;
     [SerializeField] private string maskSelectScene;
     [SerializeField] private string gameScene;
 
-    private enum GameState
-    {
-        MAIN_MENU,
-        MASK_SELECT,
-        IN_GAME
-    }
-
+    [SerializeField] private GameState defaultGameState;
     private GameState gameState;
 
     void Awake()
     {
-        DontDestroyOnLoad(this.gameObject);
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
 
-        SceneManager.LoadScene(mainMenuScene);
-        gameState = GameState.MAIN_MENU;
+        Instance = this;
+        DontDestroyOnLoad(this.gameObject);
+        ChangeState(defaultGameState);
     }
 
-    private void Update()
+    public void ChangeState(GameState newState)
     {
-        if (gameState == GameState.MAIN_MENU)
+        if (newState == gameState) return;
+        gameState = newState;
+        switch (gameState)
         {
-            if (Input.anyKeyDown)
-            {
+            case GameState.MAIN_MENU:
+                SceneManager.LoadScene(mainMenuScene);
+                break;
+            case GameState.MASK_SELECT:
                 SceneManager.LoadScene(maskSelectScene);
-                gameState = GameState.MASK_SELECT;
-            }
+                break;
+            case GameState.IN_GAME:
+                SceneManager.LoadScene(gameScene);
+                PlayerInstance[] players = FindObjectsByType<PlayerInstance>(FindObjectsSortMode.None);
+                foreach (PlayerInstance player in players) player.OnGameSceneLoad();
+                break;
         }
     }
+}
+public enum GameState
+{
+    MAIN_MENU,
+    MASK_SELECT,
+    IN_GAME
 }

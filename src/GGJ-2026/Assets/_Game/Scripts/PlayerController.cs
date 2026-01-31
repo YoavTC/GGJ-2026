@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -10,6 +9,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private MovementSystem _movementSystem;
     [SerializeField] private CombatSystem _combatSystem;
     [SerializeField] private RopeSwingSystem _ropeSwingSystem;
+    [SerializeField] private PlayerInput _playerInput;
+
+    public PlayerInput PlayerInput => _playerInput;
 
     [Header("Ground Check")]
     [SerializeField] private float _groundCheckRadius = 0.1f;
@@ -17,7 +19,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private LayerMask _groundLayer;
 
     public List<MaskScriptableObjext> playerMasks = new List<MaskScriptableObjext>(3);
-    private MaskScriptableObjext currentMask;
+    public MaskScriptableObjext currentMask;
 
     // Input states
     Vector2 _move;
@@ -86,7 +88,7 @@ public class PlayerController : MonoBehaviour
     private bool _isStunned;
     public bool IsStunned => _isStunned;
 
-   
+
 
 
 
@@ -167,7 +169,7 @@ public class PlayerController : MonoBehaviour
         {
             return;
         }
-       
+
         _movementSystem.HandleMovement(_ground, _jump, _move, _knockbackData, IsHeavy);
         _knockbackData = KnockbackData.Empty;
         _jump = false;
@@ -185,7 +187,7 @@ public class PlayerController : MonoBehaviour
                 _ropeSwingSystem.ReleaseRope();
                 _jump = false;
             }
-            
+
             _ropeSwingSystem.ApplyPlayerControl(_move.x);
         }
         else
@@ -201,42 +203,35 @@ public class PlayerController : MonoBehaviour
 
     private void HandleCombat()
     {
-        if (!_canAttack) return;
+        // If currently dashing or Kamikaze coroutine is running, block attacks
+        if (_combatSystem.IsBusy) return;
 
-        if (_ability)
+        // Slam Down first (midair + down + melee)
+        if (_melee && !_ground && _move.y < -0.5f)
         {
-            if (_maskCooldownTimer <= 0f)
-            {
-                _canAttack = false;
-                _attackCooldownTimer = currentMask.maskCooldown;
-                _maskCooldownTimer = currentMask.maskCooldown;
-
-                Vector2 aimDir = _move.normalized; // use movement input as aim
-                _combatSystem.HandleCombat(false, false, true, currentMask.MaskType, aimDir);
-            }
-        }
-        else if (_melee)
-        {
-            if (!_ground && _move.y < -0.5f)
-            {
-                // Slam down attack
-                _canAttack = false;
-                _attackCooldownTimer = _slamDownCooldown;
-                _combatSystem.HandleCombat(melee: false, slamDown: true, ability: false, currentMask.MaskType);
-                _stunTimer = 0.5f;
-            }
-            else
-            {
-                // Normal melee
-                _canAttack = false;
-                _attackCooldownTimer = _meleeCooldown;
-                _combatSystem.HandleCombat(melee: true, slamDown: false, ability: false, currentMask.MaskType);
-            }
+            _combatSystem.HandleCombat(melee: false, slamDown: true, ability: false, currentMask.MaskType);
+            _attackCooldownTimer = _slamDownCooldown;
+            return;
         }
 
+        // Normal melee
+        if (_melee)
+        {
+            _combatSystem.HandleCombat(melee: true, slamDown: false, ability: false, currentMask.MaskType);
+            _attackCooldownTimer = _meleeCooldown;
+            return;
+        }
+
+        // Ability (respect cooldown)
+        if (_ability && _maskCooldownTimer <= 0f)
+        {
+            _maskCooldownTimer = currentMask.maskCooldown;
+            _combatSystem.HandleCombat(melee: false, slamDown: false, ability: true, currentMask.MaskType, _move.normalized);
+        }
     }
 
-    public void HandleGetHit(float damage,Vector2 attackerPosition,PlayerController attacker=null) 
+
+    public void HandleGetHit(float damage, Vector2 attackerPosition, PlayerController attacker = null)
     {
         if (IsDeflecting && attacker != null)
         {
@@ -246,7 +241,7 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        Debug.Log("Fuck I'm Hit "+damage);
+        Debug.Log("Fuck I'm Hit " + damage);
         knockbackPercentage += damage;
 
         Rigidbody2D rb = GetComponent<Rigidbody2D>();
@@ -270,7 +265,7 @@ public class PlayerController : MonoBehaviour
 
         // Calculate final force
         //float force = Mathf.Pow(knockbackPercentage + damage, 1.1f) * knockbackForceMultiplier;
-        float force =Mathf.Pow(knockbackPercentage + damage, 1.15f)* knockbackForceMultiplier * KnockbackResistanceMultiplier;
+        float force = Mathf.Pow(knockbackPercentage + damage, 1.15f) * knockbackForceMultiplier * KnockbackResistanceMultiplier;
         Debug.DrawRay(transform.position, direction * 3f, Color.red, 1f);
 
         // Apply knockback
@@ -284,7 +279,7 @@ public class PlayerController : MonoBehaviour
     public void SetDeflecting(bool value)
     {
         IsDeflecting = value;
-        if (IsDeflecting) { deflectBubble.SetActive(true); }else{ deflectBubble.SetActive(false); }
+        if (IsDeflecting) { deflectBubble.SetActive(true); } else { deflectBubble.SetActive(false); }
     }
 
     public void SetHeavy(bool value)
@@ -296,7 +291,7 @@ public class PlayerController : MonoBehaviour
     {
         if (!_isDashing) return;
 
-        if (collision.gameObject.TryGetComponent<PlayerController>(out var enemy))
+        if (collision.gameObject.TryGetComponent<PlayerController>(out PlayerController enemy))
         {
             enemy.HandleGetHit(30f, transform.position);
         }

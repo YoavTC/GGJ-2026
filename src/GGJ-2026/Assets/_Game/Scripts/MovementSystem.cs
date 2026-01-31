@@ -21,73 +21,75 @@ public class MovementSystem : MonoBehaviour
     [SerializeField] private float _heavyMoveMultiplier = 0.6f;
     [SerializeField] private float _heavyJumpMultiplier = 0.7f;
 
+    [SerializeField]
+    private Animator _animator;
+
+
+    private bool _hasLeftGround = false; // track if player is in air
+
+    private bool _isInAir = false; // tracks if the player has left the ground
 
     public void HandleMovement(bool ground, bool jump, Vector2 move, KnockbackData knokbackData, bool isHeavy)
     {
-        /*
-        if (knokbackData.Force != 0f)
-        {
-            // Apply knockback
-        }*/
         if (GetComponent<PlayerController>().IsDashing)
             return;
 
-
+        // Reset jump count and air flag when grounded
         if (ground)
         {
             jumpCount = 0;
+            _isInAir = false;
         }
         else if (jumpCount == 0)
         {
-            // If we fall off a ledge without jumping, count it as the first jump used
+            // walking off ledge counts as first jump
             jumpCount = 1;
         }
 
-        float bunnyHoppingPunishFactor =
-            _punishBunnyHopping ? _bunnyHoppingPunishCurve.Evaluate(jumpCount) : 1f;
-
+        float bunnyHoppingPunishFactor = _punishBunnyHopping ? _bunnyHoppingPunishCurve.Evaluate(jumpCount) : 1f;
         float moveMultiplier = isHeavy ? _heavyMoveMultiplier : 1f;
         float jumpMultiplier = isHeavy ? _heavyJumpMultiplier : 1f;
 
         // Horizontal movement
         float targetSpeedX = move.x * _moveSpeed * moveMultiplier * bunnyHoppingPunishFactor;
-
-
-        // Horizontal movement (use movement.x)
-        // float targetSpeedX = move.x * _moveSpeed * bunnyHoppingPunishFactor;
         float accel = _acceleration * (ground ? 1f : _airControl);
 
-        float newVelX = Mathf.MoveTowards(
-            _rb.linearVelocity.x,
-            targetSpeedX,
-            accel * Time.deltaTime
-        );
+        float newVelX = Mathf.MoveTowards(_rb.linearVelocity.x, targetSpeedX, accel * Time.deltaTime);
 
-        // Flip sprite based on horizontal movement
-        if (newVelX > 0.1f && !_facingRight)
-        {
-            Flip();
-        }
-        else if (newVelX < -0.1f && _facingRight)
-        {
-            Flip();
-        }
+        // Flip sprite
+        if (newVelX > 0.1f && !_facingRight) Flip();
+        else if (newVelX < -0.1f && _facingRight) Flip();
 
         int maxJumps = _doubleJump ? 2 : 1;
 
+        // Jumping
         if (jump && jumpCount < maxJumps)
         {
-            _rb.linearVelocity = new Vector2(
-                newVelX,
-                _jumpForce * jumpMultiplier * bunnyHoppingPunishFactor
-            );
+            _rb.linearVelocity = new Vector2(newVelX, _jumpForce * jumpMultiplier * bunnyHoppingPunishFactor);
             jumpCount++;
+            _isInAir = true; // player left the ground
         }
         else
         {
             _rb.linearVelocity = new Vector2(newVelX, _rb.linearVelocity.y);
+
+            if (!ground && !_isInAir && Mathf.Abs(_rb.linearVelocity.y) > 0f)
+            {
+                // player walked off a ledge
+                _isInAir = true;
+            }
         }
+
+        // --- Animator updates ---
+        // Walking only when grounded and moving horizontally
+        _animator.SetBool("isWalking", ground && Mathf.Abs(newVelX) > 0.1f);
+
+        // Jumping any time player is in air
+        _animator.SetBool("isJumping", _isInAir);
     }
+
+
+
 
     private void Flip()
     {
