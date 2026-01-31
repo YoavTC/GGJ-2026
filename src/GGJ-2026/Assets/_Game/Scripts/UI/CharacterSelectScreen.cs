@@ -63,7 +63,12 @@ public class CharacterSelectScreen : MonoBehaviour
             }
         }
 
-        //Destroy(_mainCamera.gameObject);
+        // Tell player instances to update their mask lists
+        PlayerInstance[] playerInstances = FindObjectsByType<PlayerInstance>(FindObjectsInactive.Include, FindObjectsSortMode.InstanceID);
+        for (int i = 0; i < playerInstances.Length; i++)
+        {
+            playerInstances[i].SaveMasks();
+        }
         Bootstrap.Instance.ChangeState(GameState.IN_GAME);
     }
 
