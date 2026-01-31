@@ -1088,6 +1088,7 @@ MonoBehaviour:
   deflectBubble: {fileID: 466470774239359346}
   dashDamage: 20
   _animator: {fileID: 2360266643824134043}
+  hurtSound: {fileID: 8300000, guid: 8efb0eabc7a3264429637796f5826f0b, type: 3}
 --- !u!114 &3402851950871506268
 MonoBehaviour:
   m_ObjectHideFlags: 0

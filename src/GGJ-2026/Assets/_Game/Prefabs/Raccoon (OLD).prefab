@@ -319,13 +319,12 @@ MonoBehaviour:
   _combatSystem: {fileID: 7105551422550602600}
   _ropeSwingSystem: {fileID: 8319120091232246666}
   _playerInput: {fileID: 0}
+  _playerInstance: {fileID: 0}
   _groundCheckRadius: 0.1
   _groundCheck: {fileID: 7549435992248108952}
   _groundLayer:
     serializedVersion: 2
     m_Bits: 8
-  playerMasks:
-  - {fileID: 11400000, guid: 7345b5e5e10ae104e9ae6df3b8abcae3, type: 2}
   currentMask: {fileID: 0}
   _meleeCooldown: 0.5
   _slamDownCooldown: 1
@@ -338,6 +337,7 @@ MonoBehaviour:
   deflectBubble: {fileID: 8721868392448858602}
   dashDamage: 20
   _animator: {fileID: 6895621966345744131}
+  hurtSound: {fileID: 8300000, guid: 8efb0eabc7a3264429637796f5826f0b, type: 3}
 --- !u!114 &5785483352434574788
 MonoBehaviour:
   m_ObjectHideFlags: 0

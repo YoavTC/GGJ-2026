@@ -90,6 +90,7 @@ public class PlayerController : MonoBehaviour
     public bool IsStunned => _isStunned;
 
     [SerializeField] private Animator _animator;
+    public AudioClip hurtSound;
 
     public void Spawn(PlayerInstance playerInstance, Queue<MaskScriptableObjext> masks)
     {
@@ -228,9 +229,10 @@ public class PlayerController : MonoBehaviour
             attacker.HandleGetHit(damage, transform.position);
             return;
         }
-
+        PlayHit();
         Debug.Log("Fuck I'm Hit " + damage);
         knockbackPercentage += damage;
+
 
         Rigidbody2D rb = GetComponent<Rigidbody2D>();
         if (rb == null) return;
@@ -270,6 +272,11 @@ public class PlayerController : MonoBehaviour
         if (IsDeflecting) { deflectBubble.SetActive(true); } else { deflectBubble.SetActive(false); }
     }
 
+    public void PlayHit()
+    {
+        Debug.Log("Playing Hurt");
+        if (hurtSound != null) AudioManager.Instance.PlayAudioClip(hurtSound);
+    }
     public void SetHeavy(bool value)
     {
         IsHeavy = value;
