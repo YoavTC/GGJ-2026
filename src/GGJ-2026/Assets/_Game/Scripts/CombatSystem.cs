@@ -1,3 +1,4 @@
+using DigitalRuby.LightningBolt;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -39,6 +40,39 @@ public class CombatSystem : MonoBehaviour
     [SerializeField] private float _dashDuration = 0.25f;
     [SerializeField] private float _dashDamage = 30f;
 
+    [Header("Kamikaze Settings")]
+    [SerializeField] private float _kamikazeDamage = 40f;
+    [SerializeField] private float _kamikazeSelfDamageMin = 0.5f;
+    [SerializeField] private float _kamikazeSelfDamageMax = 0.75f;
+    [SerializeField] private Vector2 _kamikazeRange = new Vector2(3f, 3f);
+    [SerializeField] private float _kamikazeChargeTime = 0.75f;
+    [Header("Kamikaze Glow")]
+    [SerializeField] private Color _kamikazeGlowColor = Color.red;
+    [SerializeField] private float _kamikazeGlowIntensity = 4f;
+    [SerializeField] private float _kamikazeGlowPulseSpeed = 20f;
+
+    [SerializeField]
+    private AnimationCurve _kamikazeChargeCurve =
+        AnimationCurve.EaseInOut(0, 1, 1, 1);
+    private SpriteRenderer _sprite;
+    private SkinnedMeshRenderer _meshRenderer;
+    private Material[] _materials;
+    private Color[] _originalEmissionColors;
+
+    [Header("Stun Mask Settings")]
+    [SerializeField] private float _stunRange = 5f;             // How far the beam goes
+    [SerializeField] private float _stunWidth = 1f;             // Width of the hitbox line
+    [SerializeField] private float _stunDuration = 1.5f;        // Duration targets are stunned
+    [SerializeField] private float _stunCooldown = 0.5f;        // Optional small delay for attack duration
+    [SerializeField] private float _stunDamage = 0f;            // Optional damage if you want
+    [Header("Stun Beam Visual")]
+    [SerializeField] private GameObject _stunBeamPrefab; // prefab with LineRenderer
+    [SerializeField] private float _stunBeamDuration = 0.15f; // beam lasts briefly
+    [SerializeField] private float _stunBeamWidth = 0.15f;
+    [Header("Stun Beam Settings")]
+    [SerializeField] private Transform _stunBeamOrigin; // assign in inspector
+
+
 
 
 
@@ -49,15 +83,36 @@ public class CombatSystem : MonoBehaviour
     {
         _player = GetComponent<PlayerController>();
         _rb = GetComponent<Rigidbody2D>();
+        _sprite = GetComponentInChildren<SpriteRenderer>();
 
         if (_rb != null)
             _originalMass = _rb.mass;
+
+        _meshRenderer = GetComponentInChildren<SkinnedMeshRenderer>();
+
+        if (_meshRenderer != null)
+        {
+            _materials = _meshRenderer.materials;
+            _originalEmissionColors = new Color[_materials.Length];
+
+            for (int i = 0; i < _materials.Length; i++)
+            {
+                if (_materials[i].HasProperty("_EmissionColor"))
+                {
+                    _originalEmissionColors[i] =
+                        _materials[i].GetColor("_EmissionColor");
+
+                    _materials[i].EnableKeyword("_EMISSION");
+                }
+            }
+        }
     }
-    public void HandleCombat(bool melee, bool slamDown, bool ability,MaskType maskType)
+    public void HandleCombat(bool melee, bool slamDown, bool ability, MaskType maskType, Vector2 aimDir = default)
+
     {
         if (_isAttacking) return;
 
-        if (ability) StartCoroutine(Ability(maskType));
+        if (ability) StartCoroutine(Ability(maskType, aimDir));
         else if (slamDown) StartCoroutine(SlamDown());
         else if (melee) StartCoroutine(Melee());
     }
@@ -104,7 +159,7 @@ public class CombatSystem : MonoBehaviour
         _isAttacking = false;
     }
 
-    private IEnumerator Ability(MaskType maskType)
+    private IEnumerator Ability(MaskType maskType,Vector2 inputDirection)
     {
         _isAttacking = false;
         Debug.Log("Starting Ability Attack");
@@ -128,9 +183,13 @@ public class CombatSystem : MonoBehaviour
                 Heavy();
                 break;
             case MaskType.KAMIKAZE:
+                Kamikaze();
                 break;
             case MaskType.DASH:
                //yield return StartCoroutine(Dash());
+                break;
+            case MaskType.STUN:
+                Stun(inputDirection); // You’ll pass aim direction here
                 break;
         }
         _isAttacking = false;
@@ -175,6 +234,14 @@ public class CombatSystem : MonoBehaviour
         Gizmos.DrawWireCube(_slamDownPoint.position, _slamDownRange);
         Gizmos.color = Color.green;
         Gizmos.DrawWireCube(_abilityPoint.position, _abilityRange);
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawWireCube(transform.position, _kamikazeRange);
+        
+        Gizmos.color = Color.yellow;
+        Vector2 center = (Vector2)transform.position + Vector2.up * (_stunRange / 2f); // placeholder
+        Gizmos.DrawWireCube(center, new Vector2(_stunWidth, _stunRange));
+
+
     }
     //Mask Abilities:
     private void Deflect()
@@ -254,10 +321,12 @@ public class CombatSystem : MonoBehaviour
             rb.linearVelocity = direction * _dashSpeed;
 
             // Compute Z-axis rotation only
-            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
+            transform.rotation = Quaternion.Euler(0f, 0f, angle);
+
             Debug.Log("Rotation Dash Angle" + angle);
 
-            transform.rotation = Quaternion.Euler(0f, 0f, angle);
+            //transform.rotation = Quaternion.Euler(0f, 0f, angle);
 
             yield return null;
         }
@@ -280,6 +349,211 @@ public class CombatSystem : MonoBehaviour
         if (_isAttacking) return;
         StartCoroutine(Dash(inputDir, isGrounded));
     }
+
+    private void Kamikaze()
+    {
+        StartCoroutine(KamikazeCoroutine());
+    }
+
+    private IEnumerator KamikazeCoroutine()
+    {
+        _isAttacking = true;
+
+        Debug.Log("KAMIKAZE CHARGING");
+
+        PlayerController player = GetComponent<PlayerController>();
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
+
+        if (player == null || rb == null)
+            yield break;
+
+        // ===== LOCK MOVEMENT =====
+        rb.linearVelocity = Vector2.zero;
+
+        float timer = 0f;
+
+        // ===== CHARGE UP =====
+        while (timer < _kamikazeChargeTime)
+        {
+            timer += Time.deltaTime;
+            float t = timer / _kamikazeChargeTime;
+
+            // PULSING EMISSION GLOW
+            if (_materials != null)
+            {
+                float pulse =
+                    0.5f + Mathf.Sin(Time.time * _kamikazeGlowPulseSpeed) * 0.5f;
+
+                float intensity =
+                    Mathf.Lerp(0f, _kamikazeGlowIntensity, t) * pulse;
+
+                for (int i = 0; i < _materials.Length; i++)
+                {
+                    if (_materials[i].HasProperty("_EmissionColor"))
+                    {
+                        _materials[i].SetColor(
+                            "_EmissionColor",
+                            _kamikazeGlowColor * intensity
+                        );
+                    }
+                }
+            }
+
+            yield return null;
+        }
+
+        // ===== BLOOM POP (1 FRAME) =====
+        if (_materials != null)
+        {
+            for (int i = 0; i < _materials.Length; i++)
+            {
+                if (_materials[i].HasProperty("_EmissionColor"))
+                {
+                    _materials[i].SetColor(
+                        "_EmissionColor",
+                        _kamikazeGlowColor * (_kamikazeGlowIntensity * 2f)
+                    );
+                }
+            }
+        }
+
+        // Let bloom catch this frame
+        yield return null;
+
+        Debug.Log("KAMIKAZE EXPLODE");
+
+        // ===== EXPLOSION =====
+        Collider2D[] hit = Physics2D.OverlapBoxAll(
+            transform.position,
+            _kamikazeRange,
+            0f
+        );
+
+        foreach (Collider2D col in hit)
+        {
+            if (!col.TryGetComponent<PlayerController>(out PlayerController target))
+                continue;
+
+            if (target == player)
+            {
+                float selfMultiplier = Random.Range(
+                    _kamikazeSelfDamageMin,
+                    _kamikazeSelfDamageMax
+                );
+
+                float selfDamage = _kamikazeDamage * selfMultiplier;
+
+                // Bias knockback upwards with some randomness
+                Vector2 randomOffset = new Vector2(
+                    Random.Range(-0.6f, 0.6f),   // horizontal variance
+                    Random.Range(1.5f, 2.5f)    // strong upward bias
+                );
+
+                // Fake hit origin BELOW the player so force pushes up
+                Vector2 fakeHitOrigin =
+                    (Vector2)transform.position - randomOffset;
+
+                target.HandleGetHit(
+                    selfDamage,
+                    fakeHitOrigin,
+                    player
+                );
+
+            }
+            else
+            {
+                target.HandleGetHit(_kamikazeDamage, transform.position, player);
+            }
+        }
+
+        // ===== RESET MATERIALS =====
+        if (_materials != null)
+        {
+            for (int i = 0; i < _materials.Length; i++)
+            {
+                if (_materials[i].HasProperty("_EmissionColor"))
+                {
+                    _materials[i].SetColor(
+                        "_EmissionColor",
+                        _originalEmissionColors[i]
+                    );
+                }
+            }
+        }
+
+        _isAttacking = false;
+    }
+
+
+
+    private void Stun(Vector2 direction)
+    {
+        StartCoroutine(StunCoroutine(direction));
+    }
+
+    private IEnumerator StunCoroutine(Vector2 direction)
+    {
+        _isAttacking = true;
+
+        PlayerController player = GetComponent<PlayerController>();
+        if (player == null) yield break;
+
+        // Normalize direction
+        if (direction.sqrMagnitude < 0.01f)
+            direction = new Vector2(Mathf.Sign(transform.localScale.x), 0f);
+        direction.Normalize();
+
+        // Create the visual beam
+        GameObject beam = new GameObject("StunBeam");
+        LineRenderer lr = beam.AddComponent<LineRenderer>();
+        lr.positionCount = 2;
+        lr.startWidth = _stunBeamWidth;
+        lr.endWidth = _stunBeamWidth;
+        lr.material = new Material(Shader.Find("Sprites/Default"));
+        lr.startColor = Color.cyan;
+        lr.endColor = Color.cyan;
+
+        Vector3 start = transform.position;
+        Vector3 end = start + (Vector3)(direction * _stunRange);
+
+        lr.SetPosition(0, start);
+        lr.SetPosition(1, end);
+
+        // Optional: parent to player so it moves if player moves
+        beam.transform.parent = transform;
+
+        // Deal stun to enemies along line
+        Vector2 center = (start + end) / 2f;
+        Vector2 size = new Vector2(_stunWidth, _stunRange);
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+
+        Collider2D[] hits = Physics2D.OverlapBoxAll(center, size, angle);
+        foreach (Collider2D col in hits)
+        {
+            if (col.gameObject == this.gameObject) continue;
+
+            if (col.TryGetComponent<PlayerController>(out PlayerController target))
+            {
+                target.HandleStun(_stunDuration);
+                if (_stunDamage > 0f)
+                    target.HandleGetHit(_stunDamage, transform.position, player);
+            }
+        }
+
+        // Keep beam visible briefly
+        yield return new WaitForSeconds(_stunBeamDuration);
+
+        Destroy(beam);
+        _isAttacking = false;
+    }
+
+
+
+
+
+
+
+
 
 }
 

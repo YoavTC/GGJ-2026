@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
@@ -82,6 +83,11 @@ public class PlayerController : MonoBehaviour
 
     public bool IsDashing => _isDashing;
     public void SetDashing(bool value) => _isDashing = value;
+    private bool _isStunned;
+    public bool IsStunned => _isStunned;
+
+   
+
 
 
 
@@ -199,25 +205,14 @@ public class PlayerController : MonoBehaviour
 
         if (_ability)
         {
-            if (_maskCooldownTimer > 0f)
-                return;
-
-            _canAttack = false;
-            _attackCooldownTimer = currentMask.maskCooldown;
-            _maskCooldownTimer = currentMask.maskCooldown;
-
-            if (currentMask.MaskType == MaskType.DASH)
+            if (_maskCooldownTimer <= 0f)
             {
-                // Only dash downwards if in air
-                Vector2 dashInput = _move;
-                if (_ground && dashInput.y < -0.1f)
-                    dashInput.y = 0f; // block downward dash on ground
+                _canAttack = false;
+                _attackCooldownTimer = currentMask.maskCooldown;
+                _maskCooldownTimer = currentMask.maskCooldown;
 
-                _combatSystem.HandleDash(dashInput.normalized, _ground);
-            }
-            else
-            {
-                _combatSystem.HandleCombat(false, false, true, currentMask.MaskType);
+                Vector2 aimDir = _move.normalized; // use movement input as aim
+                _combatSystem.HandleCombat(false, false, true, currentMask.MaskType, aimDir);
             }
         }
         else if (_melee)
@@ -307,5 +302,24 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void HandleStun(float duration)
+    {
+        if (_isStunned) return;
+        _isStunned = true;
+
+        // Optional: prevent movement/attacks
+        _canMove = false;
+        _canAttack = false;
+
+        StartCoroutine(StunCoroutine(duration));
+    }
+
+    private IEnumerator StunCoroutine(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        _isStunned = false;
+        _canMove = true;
+        _canAttack = true;
+    }
 
 }

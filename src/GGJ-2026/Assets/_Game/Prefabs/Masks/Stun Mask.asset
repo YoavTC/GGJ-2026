@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1bac52b2832521a48adce018af9dc9d8, type: 3}
-  m_Name: Kamikaze Mask
+  m_Name: Stun Mask
   m_EditorClassIdentifier: 
-  MaskType: 4
-  MaskIcon: {fileID: -64049637, guid: e31b7299da048ac44a19ba5f212a26c6, type: 3}
-  MaskPrefab: {fileID: 501501683627888179, guid: d2b1340f3fe5b8142b959bc2dcc27296, type: 3}
-  MaskName: Kamikaze Mask
-  Description: Detonate yourself, taking big damage but causing even bigger damage.
-  maskCooldown: 10
+  MaskType: 5
+  MaskIcon: {fileID: 0}
+  MaskPrefab: {fileID: 0}
+  MaskName: Stun Mask
+  Description: 
+  maskCooldown: 6

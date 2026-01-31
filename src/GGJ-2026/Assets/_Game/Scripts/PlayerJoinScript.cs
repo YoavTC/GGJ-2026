@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
 public class PlayerJoinScript : MonoBehaviour
@@ -8,7 +7,7 @@ public class PlayerJoinScript : MonoBehaviour
     [SerializeField] private PlayerInputManager playerInputManager;
     [SerializeField] private List<Transform> spawnPoints;
 
-    public UnityEvent NotEnoughControllersUnityEvent;
+    private int nextSpawnIndex = 0;
 
     private void OnEnable()
     {
@@ -20,33 +19,25 @@ public class PlayerJoinScript : MonoBehaviour
         playerInputManager.onPlayerJoined -= OnPlayerJoined;
     }
 
-    // Called by your UI menu
-    public void OpenJoinMenu()
-    {
-        Debug.Log("Join menu opened");
-        playerInputManager.EnableJoining();
-    }
-
-    // Called when menu closes / game starts
-    public void CloseJoinMenu()
-    {
-        Debug.Log("Join menu closed");
-        playerInputManager.DisableJoining();
-    }
-
     private void OnPlayerJoined(PlayerInput playerInput)
     {
-        PositionPlayerTransforms(playerInput);
-    }
+        if (nextSpawnIndex >= spawnPoints.Count)
+        {
+            Debug.LogWarning("No spawn point available for player");
+            return;
+        }
 
-    private void PositionPlayerTransforms(PlayerInput playerInput)
-    {
-        Transform playerRoot = playerInput.transform.root;
+        Transform spawnPoint = spawnPoints[nextSpawnIndex];
+
+        Transform playerRoot = playerInput.transform;
+        playerRoot.position = spawnPoint.position;
+        playerRoot.rotation = spawnPoint.rotation;
 
         playerRoot.tag = "Player";
         playerRoot.name = $"Player {playerInput.playerIndex}";
-        playerRoot.position = spawnPoints[playerInput.playerIndex].position;
 
-        Debug.Log($"Player {playerInput.playerIndex} joined");
+        Debug.Log($"Player {playerInput.playerIndex} spawned at {spawnPoint.name}");
+
+        nextSpawnIndex++;
     }
 }

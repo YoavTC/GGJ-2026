@@ -18,5 +18,6 @@ public enum MaskType
     DEFLECT,
     DASH,
     ANCHOR,
-    KAMIKAZE
+    KAMIKAZE,
+    STUN
 }
